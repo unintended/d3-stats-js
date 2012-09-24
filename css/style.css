@@ -5,3 +5,19 @@
 .input-small-light {
     min-width: 90px;
 }
+
+.center {
+    text-align: center;
+}
+
+#content {
+    margin: 80px auto;
+}
+
+.thumbnail:hover {
+    text-decoration: none;
+}
+
+.paragon {
+    color: #3a87ad;
+}

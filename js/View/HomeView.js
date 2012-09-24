@@ -1,5 +1,7 @@
 window.HomeView = Backbone.View.extend({
 
+    className: "hero-unit",
+
     initialize:function () {
         console.log('Initializing Home View');
 
@@ -16,7 +18,7 @@ window.HomeView = Backbone.View.extend({
     },
 
     sumbitBtnClick:function () {
-        Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""));
+        Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""), {'trigger': true});
     }
 
 });

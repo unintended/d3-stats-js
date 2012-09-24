@@ -1,5 +1,7 @@
 window.HeaderView = Backbone.View.extend({
 
+    className: "navbar navbar-inverse navbar-fixed-top",
+
     initialize: function () {
         var self = this;
         this.model.hero.bind("change", this.render, this);
