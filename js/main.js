@@ -8,32 +8,18 @@ window.Router = Backbone.Router.extend({
     },
 
     initialize: function () {
-        this.profile = new Profile();
-        this.hero = new Hero();
-        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
+        this.model = new MainModel();
+        this.model.profile.on('change', this.profileChanged, this);
+//        this.profile = new Profile();
+//        this.hero = new Hero();
+//        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
+        this.headerView = new HeaderView({model: this.model});
         $('.header').html(this.headerView.render().el);
     },
 
-    welcome: function() {
-        this.profile.clear();
-        this.hero.clear();
-
-        if (!this.homeView) {
-            this.homeView = new HomeView();
-            this.homeView.render();
-        } else {
-            this.homeView.delegateEvents(); // delegate events when the view is recycled
-        }
-        $("#content").html(this.homeView.el);
-    },
-
-    profile: function(profile) {
-//        this.profile.clear();
-        this.hero.clear();
-        this.profile.loadProfileForId(profile);
-
+    profileChanged: function() {
         if (!this.selectHeroView) {
-            this.selectHeroView = new SelectHeroView({model: this.profile});
+            this.selectHeroView = new SelectHeroView({model: this.model});
             this.selectHeroView.render();
         } else {
             this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
@@ -42,9 +28,39 @@ window.Router = Backbone.Router.extend({
         $("#content").html(this.selectHeroView.el);
     },
 
+    welcome: function() {
+//        this.model.clear();
+
+//        this.profile.clear();
+//        this.hero.clear();
+
+        if (!this.homeView) {
+            this.homeView = new HomeView({model: this.model});
+            this.homeView.render();
+        } else {
+            this.homeView.delegateEvents(); // delegate events when the view is recycled
+        }
+        $("#content").html(this.homeView.el);
+    },
+
+    profile: function(battletag) {
+        this.model.profile.loadProfile(battletag);
+//        this.hero.clear();
+//        this.profile.loadProfileForId(profile);
+//
+//        if (!this.selectHeroView) {
+//            this.selectHeroView = new SelectHeroView({model: this.profile});
+//            this.selectHeroView.render();
+//        } else {
+//            this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
+//        }
+//
+//        $("#content").html(this.selectHeroView.el);
+    },
+
     hero: function(profile, heroId, page) {
 //        this.profile.clear();
-        this.hero.clear();
+//        this.hero.clear();
         this.profile.loadProfileForId(profile);
         this.hero.loadHero(profile, heroId);
 
