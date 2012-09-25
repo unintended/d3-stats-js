@@ -101,24 +101,30 @@ window.MainModel = Backbone.Model.extend({
 //        this.battleTag = null;
 //        this.battleTagSafe = null;
         var self = this;
+
         this.profile = new Profile();
         this.profile.url = this.profileUrl; // TODO: a good place to add support for international servers
         this.profile.on('change:battleTagSafe', function(profile) {
             Backbone.history.navigate('profile/' + profile.get('battleTagSafe'));
         });
 
-        this.profile.on('change:battleTagSafe', function(profile) {
-            Backbone.history.navigate('profile/' + profile.get('battleTagSafe'));
+        this.hero = new Hero();
+        this.hero.url = this.profileUrl;
+        this.hero.on('change:id', function(hero) {
+            Backbone.history.navigate('hero/' + self.profile.get('battleTagSafe') + '/' + hero.get('id'));
         });
 
 //        this.heroId = null;
-        this.hero = new Hero();
 //        this.heroLoading = false;
 
 //        this.on('change:battleTag', this.updateBattleTagSafe);
 
 //        this.on('change:battleTag', this.loadProfile);
 //        this.on('change:profile', this.updateHeroes)
+    },
+
+    defaults: {
+        "page":  "damage"
     }
 
     /*loadProfile: function(battletag) {

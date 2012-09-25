@@ -10,6 +10,7 @@ window.Router = Backbone.Router.extend({
     initialize: function () {
         this.model = new MainModel();
         this.model.profile.on('change', this.profileChanged, this);
+        this.model.hero.on('change', this.heroChanged, this);
 //        this.profile = new Profile();
 //        this.hero = new Hero();
 //        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
@@ -28,6 +29,18 @@ window.Router = Backbone.Router.extend({
         $("#content").html(this.selectHeroView.el);
     },
 
+    heroChanged: function() {
+        if (!this.heroStatsView) {
+            this.heroStatsView = new HeroStatsView({model: this.model});
+            this.heroStatsView.render();
+        } else {
+            this.heroStatsView.render();
+            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
+        }
+
+        $("#content").html(this.heroStatsView.el);
+    },
+
     welcome: function() {
 //        this.model.clear();
 
@@ -38,6 +51,7 @@ window.Router = Backbone.Router.extend({
             this.homeView = new HomeView({model: this.model});
             this.homeView.render();
         } else {
+            this.homeView.render();
             this.homeView.delegateEvents(); // delegate events when the view is recycled
         }
         $("#content").html(this.homeView.el);
@@ -58,20 +72,21 @@ window.Router = Backbone.Router.extend({
 //        $("#content").html(this.selectHeroView.el);
     },
 
-    hero: function(profile, heroId, page) {
+    hero: function(battletag, heroId) {
 //        this.profile.clear();
 //        this.hero.clear();
-        this.profile.loadProfileForId(profile);
-        this.hero.loadHero(profile, heroId);
-
-        if (!this.heroStatsView) {
-            this.heroStatsView = new HeroStatsView({model: {'profile': this.profile, 'hero': this.hero, 'page': page}});
-            this.heroStatsView.render();
-        } else {
-            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
-        }
-
-        $("#content").html(this.heroStatsView.el);
+//        this.profile.loadProfileForId(profile);
+        this.model.profile.set({'battleTagSafe': battletag});
+        this.model.hero.loadHero(battletag, heroId);
+//
+//        if (!this.heroStatsView) {
+//            this.heroStatsView = new HeroStatsView({model: {'profile': this.profile, 'hero': this.hero, 'page': page}});
+//            this.heroStatsView.render();
+//        } else {
+//            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
+//        }
+//
+//        $("#content").html(this.heroStatsView.el);
     }
 
 

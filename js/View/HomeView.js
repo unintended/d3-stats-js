@@ -8,12 +8,7 @@ window.HomeView = Backbone.View.extend({
         this.template = _.template($('#welcome-template').html());
 
         var self = this;
-        this.model.profile.on('change:loading', function(profile) {
-            if (profile.get('loading'))
-                $('#bt_submit', self.el).button('loading');
-            else
-                $('#bt_submit', self.el).button('reset');
-        });
+        this.model.profile.on('change:loading', this.renderLoading, this);
     },
 
     events:{
@@ -22,7 +17,15 @@ window.HomeView = Backbone.View.extend({
 
     render:function () {
         $(this.el).html(this.template());
+        this.renderLoading();
         return this;
+    },
+
+    renderLoading: function() {
+        if (this.model.profile.get('loading'))
+            $('#bt_submit', self.el).button('loading');
+        else
+            $('#bt_submit', self.el).button('reset');
     },
 
     sumbitBtnClick:function () {
