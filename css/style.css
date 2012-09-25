@@ -23,18 +23,34 @@
 }
 
 .table-list {
-  margin-bottom: 20px;
+  margin-bottom: 3px;
   margin-left: 0;
   list-style: none;
 }
 
 .table-list li {
   display: block;
-  padding: 3px 15px;
-  /*font-size: 11px;
-  font-weight: bold;
-  line-height: 20px;
-  color: #999999;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;*/
+  padding: 2px 15px;
+  font-size: 11px;
+  /*font-weight: bold;*/
+  /*line-height: 20px;*/
+  /*color: #999999;*/
+  /*text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);*/
+  /*text-transform: uppercase;*/
+}
+
+.table-list .nav-header {
+    padding: 2px 15px 0;
+}
+
+.d3-color-green {
+    color: #A4DF44 !important;
+}
+
+.d3-color-yellow {
+    color: yellow !important;
+}
+
+.d3-color-orange {
+    color: #FBA412 !important;
 }

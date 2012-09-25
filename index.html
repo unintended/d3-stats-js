@@ -119,16 +119,53 @@
         </ul>
 
         <h3>Gear</h3>
-        <ul class="table-list item-slot item-slot-head">
+        <ul class="table-list item-slot-head">
             <li class="nav-header">Head</li>
         </ul>
-        <ul class="table-list item-slot item-slot-shoulders">
+        <ul class="table-list item-slot-shoulders">
             <li class="nav-header">Shoulders</li>
+        </ul>
+        <ul class="table-list item-slot-neck">
+            <li class="nav-header">Neck</li>
+        </ul>
+        <ul class="table-list item-slot-hands">
+            <li class="nav-header">Hands</li>
+        </ul>
+        <ul class="table-list item-slot-torso">
+            <li class="nav-header">Torso</li>
+        </ul>
+        <ul class="table-list item-slot-bracers">
+            <li class="nav-header">Bracers</li>
+        </ul>
+        <ul class="table-list item-slot-leftFinger">
+            <li class="nav-header">Left Finger</li>
+        </ul>
+        <ul class="table-list item-slot-rightFinger">
+            <li class="nav-header">Right Finger</li>
+        </ul>
+        <ul class="table-list item-slot-waist">
+            <li class="nav-header">Waist</li>
+        </ul>
+        <ul class="table-list item-slot-legs">
+            <li class="nav-header">Legs</li>
+        </ul>
+        <ul class="table-list item-slot-feet">
+            <li class="nav-header">Feet</li>
+        </ul>
+        <ul class="table-list item-slot-mainHand">
+            <li class="nav-header">Main Hand</li>
+        </ul>
+        <ul class="table-list item-slot-offHand">
+            <li class="nav-header">Off Hand</li>
         </ul>
     </script>
 
-    <script type="text/template" id="hero-stats-item-slot-template">
-
+    <script type="text/template" id="item-template">
+        <strong class="d3-color-<%= displayColor %>"><%= name %></strong>
+        +<%= dex %> Dex,
+        +<% print((cc * 100).toFixed(1)); %>% CC,
+        +<% print((cdmg * 100).toFixed(0)); %>% CDmg,
+        +<%= mindmg %>-<%= maxdmg %> Dmg
     </script>
 </div>
 

@@ -8,28 +8,86 @@ window.HeroStatsView = Backbone.View.extend({
 
         this.template = _.template($('#hero-stats-template').html());
 
+        var self = this;
+
         this.simulationModel = new SimulationModel();
-        this.simulationModel.items.on('reset', this.resetSlots);
-//        this.simulationModel.defaultGearSet.on('change', this.renderSimulation, this);
-//        this.simulationModel
-
-//        this.itemTemplate = _.template($('#select-hero-item-template').html());
+        this.simulationModel.head.on('add remove', function() { self.renderSlot($('.item-slot-head', self.el), this) });
+        this.simulationModel.shoulders.on('add remove', function() { self.renderSlot($('.item-slot-shoulders', self.el), this) });
+        this.simulationModel.neck.on('add remove', function() { self.renderSlot($('.item-slot-neck', self.el), this) });
+        this.simulationModel.hands.on('add remove', function() { self.renderSlot($('.item-slot-hands', self.el), this) });
+        this.simulationModel.torso.on('add remove', function() { self.renderSlot($('.item-slot-torso', self.el), this) });
+        this.simulationModel.bracers.on('add remove', function() { self.renderSlot($('.item-slot-bracers', self.el), this) });
+        this.simulationModel.leftFinger.on('add remove', function() { self.renderSlot($('.item-slot-leftFinger', self.el), this) });
+        this.simulationModel.rightFinger.on('add remove', function() { self.renderSlot($('.item-slot-rightFinger', self.el), this) });
+        this.simulationModel.waist.on('add remove', function() { self.renderSlot($('.item-slot-waist', self.el), this) });
+        this.simulationModel.legs.on('add remove', function() { self.renderSlot($('.item-slot-legs', self.el), this) });
+        this.simulationModel.feet.on('add remove', function() { self.renderSlot($('.item-slot-feet', self.el), this) });
+        this.simulationModel.mainHand.on('add remove', function() { self.renderSlot($('.item-slot-mainHand', self.el), this) });
+        this.simulationModel.offHand.on('add remove', function() { self.renderSlot($('.item-slot-offHand', self.el), this) });
     },
 
-    resetSlots: function() {
-        $('.item-slot li', this.el);
-    },
+    renderSlot: function (slotEl, items) {
+        $('.item', slotEl).remove();
 
-    renderSlot: function(slot) {
-        $('.item-slot-' + slot.get('name'), this.el);
+        items.each(function(item) {
+            var itemView = new ItemView({model: item});
+            slotEl.append(itemView.render().el);
+        });
     },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderShouldersSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
+//
+//    renderHeadSlot: function(g) {
+//        this.renderSlot($('.item-slot-head', this.el), this.simulationModel.head);
+//    },
 
     /*events:{
         "click #bt_submit":"sumbitBtnClick"
     },   */
 
     updateSimulationModel: function(hero) {
-        this.simulationModel.clear();
         this.simulationModel.loadFromHero(hero);
     },
 
@@ -54,6 +112,7 @@ window.HeroStatsView = Backbone.View.extend({
 
         this.updatePage();
         this.updateSimulationModel(this.model.hero);
+//        this.renderHeadSlot();
 
 /*
         _.each(this.model.hero.get('items'), function(item, slot) {
@@ -90,14 +149,17 @@ window.HeroStatsView = Backbone.View.extend({
 
 });
 
-window.ItemStatsView = Backbone.View.extend({
+window.ItemView = Backbone.View.extend({
+
+    tagName: 'li',
 
     initialize: function() {
         this.model.on('change', this.render, this);
+        this.template = _.template($('#item-template').html());
     },
 
     render: function() {
-        var itemLi = $('<li/>').text(slot);$('<strong/>').text(item.name).appendTo(itemLi);
+        this.$el.html(this.template(this.model.toJSON()));
         return this;
     }
 
