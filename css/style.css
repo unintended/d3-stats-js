@@ -43,14 +43,27 @@
     padding: 2px 15px 0;
 }
 
+.table tbody tr:first-child td {
+    border-top: none;
+    padding-top: 20px;
+}
+
+.table tbody + tbody {
+    border-top: none;
+}
+
+.item-stat {
+    font-weight: bold;
+}
+
 .d3-color-green {
-    color: #A4DF44 !important;
+    color: #339900 !important;
 }
 
 .d3-color-yellow {
-    color: yellow !important;
+    color: #999900 !important;
 }
 
 .d3-color-orange {
-    color: #FBA412 !important;
+    color: #993300 !important;
 }

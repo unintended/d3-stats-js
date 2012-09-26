@@ -9,8 +9,8 @@ window.Router = Backbone.Router.extend({
 
     initialize: function () {
         this.model = new MainModel();
-        this.model.profile.on('change', this.profileChanged, this);
-        this.model.hero.on('change', this.heroChanged, this);
+//        this.model.profile.on('change', this.profileChanged, this);
+//        this.model.hero.on('change', this.heroChanged, this);
 //        this.profile = new Profile();
 //        this.hero = new Hero();
 //        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
@@ -18,28 +18,28 @@ window.Router = Backbone.Router.extend({
         $('.header').html(this.headerView.render().el);
     },
 
-    profileChanged: function() {
-        if (!this.selectHeroView) {
-            this.selectHeroView = new SelectHeroView({model: this.model});
-            this.selectHeroView.render();
-        } else {
-            this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
-        }
+//    profileChanged: function() {
+//        if (!this.selectHeroView) {
+//            this.selectHeroView = new SelectHeroView({model: this.model});
+//            this.selectHeroView.render();
+//        } else {
+//            this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
+//        }
+//
+//        $("#content").html(this.selectHeroView.el);
+//    },
 
-        $("#content").html(this.selectHeroView.el);
-    },
-
-    heroChanged: function() {
-        if (!this.heroStatsView) {
-            this.heroStatsView = new HeroStatsView({model: this.model});
-            this.heroStatsView.render();
-        } else {
-            this.heroStatsView.render();
-            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
-        }
-
-        $("#content").html(this.heroStatsView.el);
-    },
+//    heroChanged: function() {
+//        if (!this.heroStatsView) {
+//            this.heroStatsView = new HeroStatsView({model: this.model});
+//            this.heroStatsView.render();
+//        } else {
+//            this.heroStatsView.render();
+//            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
+//        }
+//
+//        $("#content").html(this.heroStatsView.el);
+//    },
 
     welcome: function() {
 //        this.model.clear();
@@ -76,6 +76,15 @@ window.Router = Backbone.Router.extend({
 //        this.profile.clear();
 //        this.hero.clear();
 //        this.profile.loadProfileForId(profile);
+
+        if (!this.heroStatsView) {
+            this.heroStatsView = new HeroStatsView({model: this.model});
+            this.heroStatsView.render();
+        } else {
+            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
+        }
+        $("#content").html(this.heroStatsView.el);
+
         this.model.profile.set({'battleTagSafe': battletag});
         this.model.hero.loadHero(battletag, heroId);
 //

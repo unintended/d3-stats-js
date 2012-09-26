@@ -37,8 +37,15 @@ var SimulationModel = Backbone.Model.extend({
                 collection.at(0).set(item);
             }
         }, this);
-    }
 
+        if (hero.get('class') == 'demon-hunter') {
+            this.set({dmgstat: 'dex'});
+        }
+    },
+
+    defaults : {
+        dmgstat: 'dex'
+    }
 });
 
 var Item = Backbone.Model.extend({
@@ -78,6 +85,8 @@ var Item = Backbone.Model.extend({
 
         if (res.mindmg > 0 && res.ddmg > 0)
             res.maxdmg = res.mindmg + res.ddmg;
+
+        res.tooltipParams = data.tooltipParams;
         this.set(res);
     },
 
@@ -112,7 +121,7 @@ var Item = Backbone.Model.extend({
         cdmg:   0,
         ias:    0,
         mindmg: 0,
-        ddmg: 0,
+        ddmg:   0,
         maxdmg: 0
 //        base_resist:  0,
 //        base_dodge:   0,

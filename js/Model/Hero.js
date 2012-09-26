@@ -71,26 +71,7 @@ window.Profile = Backbone.Model.extend({
                 self.set({loading:false, profileLoadingFailed: true, lastTriedBattleTag: battletag});
             }
         });
-
-
-/*
-        var url = this.url + profile + '/';
-        console.log('fetch: ' + url);
-        var self = this;
-        $.ajax({
-            url:url,
-            dataType:"jsonp",
-            success:function (data) {
-                if (!data.heroes || data.code && data.code == 'OOPS') {
-                    self.clear();
-                    return;
-                }
-                self.set({battleTag: data.battleTag, battleTagSafe: data.battleTag.replace('#', '-'), heroes: data.heroes});
-//                console.log("profile search success: " + JSON.stringify(self.toJSON()));
-            }
-        });*/
     }
-
 });
 
 window.MainModel = Backbone.Model.extend({
