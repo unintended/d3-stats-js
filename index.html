@@ -121,7 +121,7 @@
         <!--<h3>Gear</h3>-->
 
         <div class="row-fluid">
-        <div class="span9">
+        <div class="span7  well well-small">
         <table class="table table-condensed" >
             <thead>
             <tr>
@@ -136,46 +136,53 @@
             </tr>
             </thead>
             <tbody class="item-slot-head">
-                <tr><td colspan="7">Head</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Head</td><td span="7"><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-shoulders">
-                <tr><td colspan="7">Shoulders</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Shoulders</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-neck">
-                <tr><td colspan="7">Neck</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Neck</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-hands">
-                <tr><td colspan="7">Hands</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Hands</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-torso">
-                <tr><td colspan="7">Torso</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Torso</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-bracers">
-                <tr><td colspan="7">Bracers</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Bracers</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-leftFinger">
-                <tr><td colspan="7">Left Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Left Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-rightFinger">
-                <tr><td colspan="7">Right Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Right Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-waist">
-                <tr><td colspan="7">Waist</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Waist</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-legs">
-                <tr><td colspan="7">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-feet">
-                <tr><td colspan="7">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-mainHand">
-                <tr><td colspan="7">Main Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Main Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
             <tbody class="item-slot-offHand">
-                <tr><td colspan="7">Off Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
+                <tr><td class="section-header">Off Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
             </tbody>
         </table>
         </div>
+
+        <div class="span5 well well-small">
+        <div class="nav-header">Base Stats</div>
+        <dl class="dl-horizontal">
+            <dt class="dmg_stat_name"></dt>
+            <dd class="base_dmg_stat"></dd>
+        </dl>
         </div>
 
 <!--
@@ -221,7 +228,7 @@
     </script>
 
     <script type="text/template" id="equipped-item-template">
-        <td class="item-stat"><a class="d3-color-<%= displayColor %>" href="http://eu.battle.net/api/d3/data/<%= tooltipParams %>" target="_blank"><%= name %></a></td>
+        <td class="item-name"><a class="d3-color-<%= displayColor %>" href="http://eu.battle.net/api/d3/data/<%= tooltipParams %>" target="_blank"><%= name %></a></td>
         <td class="item-stat dmgstat"></td>
         <td class="item-stat cc"></td>
         <td class="item-stat cdmg"></td>

@@ -54,6 +54,12 @@ window.HeroStatsView = Backbone.View.extend({
     render:function () {
         $(this.el).html(this.template(this.simulationModel.toJSON()));
 
+        var dmgstat = this.simulationModel.get('dmgstat');
+
+        $('.dmg_stat_name', this.el).text(dmgstat);
+        $('.base_dmg_stat', this.el).text(this.simulationModel.get('base_' + dmgstat));
+
+
 //        this.updateSimulationModel(this.model.hero);
 
 //        $('li', this.el).click(function(event) {
@@ -107,7 +113,6 @@ window.ItemView = Backbone.View.extend({
 
     initialize: function() {
         this.model.on('change', this.render, this);
-
         this.template = _.template($('#item-template').html());
     },
 

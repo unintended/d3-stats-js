@@ -38,12 +38,62 @@ var SimulationModel = Backbone.Model.extend({
             }
         }, this);
 
-        if (hero.get('class') == 'demon-hunter') {
-            this.set({dmgstat: 'dex'});
+        this.updateBaseStats(hero);
+    },
+
+    getBaseStatsForLevel: function(basestat, level) {
+        var res = {};
+
+        return {}
+    },
+
+    updateBaseStats : function(hero) {
+
+        var basestat;
+        var heroClass = hero.get('class');
+        var absLevel = hero.get('level') + hero.get('paragonLevel');
+
+        if (heroClass == 'demon-hunter' || heroClass == 'monk') {
+            basestat = 'dex';
+        } else if (heroClass == 'wizard' || heroClass == 'witch-doctor') {
+            basestat = 'int';
+        } else if (heroClass == 'warrior') {
+            basestat = 'str';
+        } else {
+            alert('unknown hero class: ' + heroClass);
+            return;
+        }
+
+        var dmgStatAfterLevel = function(k) {
+            return 10 + k * (absLevel - 1)
+        };
+
+        this.set({
+            base_dex: dmgStatAfterLevel(this.statsPerLevel[heroClass].dex),
+            base_vit: dmgStatAfterLevel(this.statsPerLevel[heroClass].vit),
+            base_str: dmgStatAfterLevel(this.statsPerLevel[heroClass].str),
+            base_intel: dmgStatAfterLevel(this.statsPerLevel[heroClass].intel),
+            dmgstat: basestat
+        });
+    },
+
+    statsPerLevel: {
+        'demon-hunter': {
+            dex: 3,
+            vit: 2,
+            intel: 1,
+            str: 1
+        },
+        'monk': {
+            dex: 3,
+            vit: 2,
+            intel: 1,
+            str: 1
         }
     },
 
     defaults : {
+        base_dex: 0,
         dmgstat: 'dex'
     }
 });
