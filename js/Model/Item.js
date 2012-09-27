@@ -64,37 +64,47 @@ var SimulationModel = Backbone.Model.extend({
             return;
         }
 
-        var dmgStatAfterLevel = function(k) {
-            return 10 + k * (absLevel - 1)
+        var statAfterLevel = function(level, stat, basestat) {
+            if (stat == 'vit')
+                return 9 + 2 * (level - 1);
+            if (stat == basestat)
+                return 10 + 3 * (level - 1);
+            return 8 + (level - 1);
         };
 
-        this.set({
-            base_dex: dmgStatAfterLevel(this.statsPerLevel[heroClass].dex),
-            base_vit: dmgStatAfterLevel(this.statsPerLevel[heroClass].vit),
-            base_str: dmgStatAfterLevel(this.statsPerLevel[heroClass].str),
-            base_intel: dmgStatAfterLevel(this.statsPerLevel[heroClass].intel),
-            dmgstat: basestat
+        var updateObj = {};
+
+        _.each(this.stats, function(stat) {
+            updateObj['base_' + stat] = statAfterLevel(absLevel, stat, basestat);
         });
+        updateObj.dmgstat = basestat;
+        this.set(updateObj);
+    },
+
+    stats: ['str', 'dex', 'int', 'vit'],
+
+    base_stats: {
+        'demon-hunter': 'dex'
     },
 
     statsPerLevel: {
         'demon-hunter': {
-            dex: 3,
-            vit: 2,
-            intel: 1,
-            str: 1
+            'dex': 3,
+            'vit': 2,
+            'int': 1,
+            'str': 1
         },
         'monk': {
-            dex: 3,
-            vit: 2,
-            intel: 1,
-            str: 1
+            'dex': 3,
+            'vit': 2,
+            'int': 1,
+            'str': 1
         }
     },
 
-    defaults : {
-        base_dex: 0,
-        dmgstat: 'dex'
+    'defaults' : {
+        'base_dex': 0,
+        'dmgstat': 'dex'
     }
 });
 
