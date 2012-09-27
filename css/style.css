@@ -30,8 +30,8 @@
 
 .table-list li {
   display: block;
-  padding: 2px 15px;
-  font-size: 11px;
+  padding: 2px 5px;
+  font-size: 12px;
   /*font-weight: bold;*/
   /*line-height: 20px;*/
   /*color: #999999;*/
@@ -39,9 +39,9 @@
   /*text-transform: uppercase;*/
 }
 
-.section-header {
-  display: block;
-  padding: 1px 15px;
+.table-list .section-header {
+  display: inline-block;
+  padding: 10px 5px 2px;
   font-size: 11px;
   font-weight: bold;
   /*line-height: 20px;*/
@@ -60,12 +60,26 @@
 }
 
 .table td {
-    white-space: nowrap;
+
 }
 
-.table .item-name {
+.item {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    /*padding: 5px ! important;*/
+}
+
+.item:hover {
+    background-color: #ddd;
+}
+
+.item-name {
     font-weight: bold;
-    max-width: 90px;
+    width: 120px;
+    padding-right: 5px;
+    display: inline-block;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }

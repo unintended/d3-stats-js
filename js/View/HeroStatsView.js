@@ -125,7 +125,7 @@ window.ItemView = Backbone.View.extend({
 
 window.EquippedItemView = Backbone.View.extend({
 
-    tagName: 'tr',
+    tagName: 'li',
 
     className: 'item',
 
@@ -137,18 +137,78 @@ window.EquippedItemView = Backbone.View.extend({
 
     render: function() {
         this.$el.html(this.template(this.model.item.toJSON()));
-        this.renderStat($('.dmgstat', this.el), this.model.item.get(this.model.dmgstat));
-        this.renderPercent($('.cc', this.el), this.model.item.get('cc'));
-        this.renderPercent($('.cdmg', this.el), this.model.item.get('cdmg'));
-        this.renderPercent($('.ias', this.el), this.model.item.get('ias'));
-        this.renderStat($('.mindmg', this.el), this.model.item.get('mindmg'));
-        this.renderStat($('.maxdmg', this.el), this.model.item.get('maxdmg'));
+
+        var self = this;
+
+        $("<span/>").addClass("item-name").append(
+            $("<a/>").attr("href", "http://eu.battle.net/api/d3/data/" + this.model.item.get("tooltipParams"))
+                .addClass("d3-color-" + this.model.item.get("displayColor"))
+                .text(this.model.item.get("name"))
+        ).appendTo(this.$el);
+
+        $('<span/>').text($.map(this.renderSettings, function(v, k) {
+            return self.renderStat(self.model.item.get(k), v);
+        }).join(', ')).appendTo(this.$el);
+
+        $("<a/>").addClass("btn btn-mini btn-info").append(
+            $("<i/>").addClass("icon-plus icon-white")
+        ).appendTo(this.$el);
+//        $(this.el).text(arr);
+
+//        this.renderStat($('.dmgstat', this.el), this.model.item.get(this.model.dmgstat));
+//        this.renderPercent($('.cc', this.el), this.model.item.get('cc'));
+//        this.renderPercent($('.cdmg', this.el), this.model.item.get('cdmg'));
+//        this.renderPercent($('.ias', this.el), this.model.item.get('ias'));
+//        this.renderStat($('.mindmg', this.el), this.model.item.get('mindmg'));
+//        this.renderStat($('.maxdmg', this.el), this.model.item.get('maxdmg'));
         return this;
     },
 
-    renderStat: function(elem, n) {
-        if (n > 0.0)
-            elem.text(n);
+    renderSettings: {
+        "dex": {
+            "postfix" : "Dex",
+            "precision": 0,
+            "percent": false
+        },
+        "vit": {
+            "postfix" : "Vit",
+            "precision": 0,
+            "percent": false
+        },
+        "str": {
+            "postfix" : "Str",
+            "precision": 0,
+            "percent": false
+        },
+        "int": {
+            "postfix" : "Int",
+            "precision": 0,
+            "percent": false
+        },
+        "cc": {
+            "postfix" : "CC",
+            "precision": 1,
+            "percent": true
+        },
+        "cdmg": {
+            "postfix" : "CDmg",
+            "precision": 0,
+            "percent": true
+        },
+        "ias": {
+            "postfix" : "IAS",
+            "precision": 2,
+            "percent": true
+        }
+    },
+
+    renderStat: function(val, settings) {
+        if (val > 0) {
+            if (settings.percent)
+                val *= 100;
+            return "+" + val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ') + settings.postfix;
+        }
+        return undefined;
     },
 
     renderPercent: function(elem, n, digits) {
