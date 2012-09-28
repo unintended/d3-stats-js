@@ -1,3 +1,8 @@
+var renderPercent = function(elem, n, digits) {
+    if (n > 0.0)
+        elem.text((n * 100).toFixed(digits) + '%');
+};
+
 window.HeroStatsView = Backbone.View.extend({
 
     initialize:function () {
@@ -24,6 +29,10 @@ window.HeroStatsView = Backbone.View.extend({
         this.simulationModel.feet.on('add remove', function() { self.renderSlot($('.item-slot-feet', self.el), this, self) });
         this.simulationModel.mainHand.on('add remove', function() { self.renderSlot($('.item-slot-mainHand', self.el), this, self) });
         this.simulationModel.offHand.on('add remove', function() { self.renderSlot($('.item-slot-offHand', self.el), this, self) });
+
+        this.simulationModel.on('change', function() {
+            this.renderBase();
+        }, this);
     },
 
     renderSlot: function (slotEl, items, mainModel) {
@@ -46,21 +55,17 @@ window.HeroStatsView = Backbone.View.extend({
         $('.' + page, this.el).addClass('active');
     },
 
-    renderSimulation: function() {
-        $('<li/>').addClass('nav-header').text('Head').appendTo($('#gear', this.el));
-//        var itemLi = $('<li/>').text(slot);
+    renderBase: function() {
+        var dmgstat = this.simulationModel.get('dmgstat');
+        $('.dmg_stat_name', this.el).text(dmgstat);
+        $('.base_dmg_stat', this.el).text(this.simulationModel.get('base_' + dmgstat));
+        renderPercent($('.base_cc_stat', this.el), this.simulationModel.get('base_cc'), 1);
+        renderPercent($('.base_cdmg_stat', this.el), this.simulationModel.get('base_cdmg'), 0);
     },
 
     render:function () {
         $(this.el).html(this.template(this.simulationModel.toJSON()));
-
-        var dmgstat = this.simulationModel.get('dmgstat');
-
-        $('.dmg_stat_name', this.el).text(dmgstat);
-        $('.base_dmg_stat', this.el).text(this.simulationModel.get('base_' + dmgstat));
-
-
-//        this.updateSimulationModel(this.model.hero);
+        this.updateSimulationModel(this.model.hero);
 
 //        $('li', this.el).click(function(event) {
 //            event.preventDefault();
@@ -150,9 +155,9 @@ window.EquippedItemView = Backbone.View.extend({
             return self.renderStat(self.model.item.get(k), v);
         }).join(', ')).appendTo(this.$el);
 
-        $("<a/>").addClass("btn btn-mini btn-info").append(
-            $("<i/>").addClass("icon-plus icon-white")
-        ).appendTo(this.$el);
+//        $("<a/>").addClass("btn btn-mini btn-info").append(
+//            $("<i/>").addClass("icon-plus icon-white")
+//        ).appendTo(this.$el);
 //        $(this.el).text(arr);
 
 //        this.renderStat($('.dmgstat', this.el), this.model.item.get(this.model.dmgstat));
@@ -209,11 +214,6 @@ window.EquippedItemView = Backbone.View.extend({
             return "+" + val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ') + settings.postfix;
         }
         return undefined;
-    },
-
-    renderPercent: function(elem, n, digits) {
-        if (n > 0.0)
-            elem.text((n * 100).toFixed(digits) + '%');
     }
 
 });

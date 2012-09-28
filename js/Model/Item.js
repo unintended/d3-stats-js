@@ -49,20 +49,9 @@ var SimulationModel = Backbone.Model.extend({
 
     updateBaseStats : function(hero) {
 
-        var basestat;
         var heroClass = hero.get('class');
         var absLevel = hero.get('level') + hero.get('paragonLevel');
-
-        if (heroClass == 'demon-hunter' || heroClass == 'monk') {
-            basestat = 'dex';
-        } else if (heroClass == 'wizard' || heroClass == 'witch-doctor') {
-            basestat = 'int';
-        } else if (heroClass == 'warrior') {
-            basestat = 'str';
-        } else {
-            alert('unknown hero class: ' + heroClass);
-            return;
-        }
+        var basestat = this.base_stats[heroClass];
 
         var statAfterLevel = function(level, stat, basestat) {
             if (stat == 'vit')
@@ -78,13 +67,17 @@ var SimulationModel = Backbone.Model.extend({
             updateObj['base_' + stat] = statAfterLevel(absLevel, stat, basestat);
         });
         updateObj.dmgstat = basestat;
+        updateObj.base_cc = 0.05;
+        updateObj.base_cdmg = 0.5;
         this.set(updateObj);
     },
 
     stats: ['str', 'dex', 'int', 'vit'],
 
     base_stats: {
-        'demon-hunter': 'dex'
+        'demon-hunter': 'dex',
+        'monk': 'dex',
+        'wizard': 'int'
     },
 
     statsPerLevel: {
