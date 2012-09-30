@@ -27,7 +27,8 @@ window.SelectHeroView = Backbone.View.extend({
             var itemEl = $(elHtml);
             $('a', itemEl).click(function(event) {
                 event.preventDefault();
-                self.model.hero.loadHero(battleTag, hero.id);
+                Backbone.history.navigate('hero/' + battleTag + '/' + hero.id, {trigger: true});
+//                self.model.hero.loadHero(battleTag, hero.id);
             });
             $('ul', self.el).append(itemEl);
         });

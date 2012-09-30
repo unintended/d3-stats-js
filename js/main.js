@@ -44,8 +44,8 @@ window.Router = Backbone.Router.extend({
     welcome: function() {
 //        this.model.clear();
 
-//        this.profile.clear();
-//        this.hero.clear();
+        this.model.profile.clear();
+        this.model.hero.clear();
 
         if (!this.homeView) {
             this.homeView = new HomeView({model: this.model});
@@ -73,9 +73,9 @@ window.Router = Backbone.Router.extend({
     },
 
     hero: function(battletag, heroId) {
-//        this.profile.clear();
-//        this.hero.clear();
-//        this.profile.loadProfileForId(profile);
+        this.model.profile.clear();
+        this.model.hero.clear();
+        this.model.profile.loadProfile(battletag);
 
         if (!this.heroStatsView) {
             this.heroStatsView = new HeroStatsView({model: this.model});
@@ -85,7 +85,7 @@ window.Router = Backbone.Router.extend({
         }
         $("#content").html(this.heroStatsView.el);
 
-        this.model.profile.set({'battleTagSafe': battletag});
+//        this.model.profile.set({'battleTagSafe': battletag});
         this.model.hero.loadHero(battletag, heroId);
 //
 //        if (!this.heroStatsView) {

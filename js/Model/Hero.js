@@ -2,6 +2,11 @@ window.Hero = Backbone.Model.extend({
 
     url: "http://eu.battle.net/api/d3/profile/",
 
+    defaults: {
+        'level': 1,
+        'paragonLevel': 0
+    },
+
     initialize:function () {
         this.level = 0;
         this.paragon = 0;
@@ -85,15 +90,15 @@ window.MainModel = Backbone.Model.extend({
 
         this.profile = new Profile();
         this.profile.url = this.profileUrl; // TODO: a good place to add support for international servers
-        this.profile.on('change:battleTagSafe', function(profile) {
-            Backbone.history.navigate('profile/' + profile.get('battleTagSafe'));
-        });
+//        this.profile.on('change:battleTagSafe', function(profile) {
+//            Backbone.history.navigate('profile/' + profile.get('battleTagSafe'));
+//        });
 
         this.hero = new Hero();
         this.hero.url = this.profileUrl;
-        this.hero.on('change:id', function(hero) {
-            Backbone.history.navigate('hero/' + self.profile.get('battleTagSafe') + '/' + hero.get('id'));
-        });
+//        this.hero.on('change:id', function(hero) {
+//            Backbone.history.navigate('hero/' + self.profile.get('battleTagSafe') + '/' + hero.get('id'));
+//        });
 
 //        this.heroId = null;
 //        this.heroLoading = false;

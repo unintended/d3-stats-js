@@ -84,6 +84,16 @@
     text-overflow: ellipsis;
 }
 
+.stat-name {
+    font-weight: bold;
+    width: 170px;
+    padding-right: 5px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .table tbody + tbody {
     border-top: none;
 }
@@ -102,4 +112,8 @@
 
 .d3-color-orange {
     color: #993300 !important;
+}
+
+.d3-color-grey {
+    color: #333 !important;
 }

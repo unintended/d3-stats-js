@@ -1,29 +1,74 @@
+var mapAttributesWithSum = function(from, to, map) {
+    _.each(from, function(v, k) {
+        if (map[k]) {
+            if (to[map[k].to] == undefined)
+                to[map[k].to] = 0;
+            if (map[k].attr)
+                to[map[k].to] += v[map[k].attr];
+            else
+                to[map[k].to] += v;
+        }
+    });
+};
+
+var StatsModel = Backbone.Model.extend({
+    initialize: function() {
+
+    },
+    'defaults' : {
+        'dex': 0,
+        'vit': 0,
+        'str': 0,
+        'int': 0,
+        'cc': 0,
+        'cdmg': 0,
+        'mindmg': 0,
+        'maxdmg': 0,
+        'deltadmg': 0
+    }
+});
 
 var SimulationModel = Backbone.Model.extend({
 
     initialize: function() {
-        this.head = new ItemCollection();
-        this.shoulders = new ItemCollection();
-        this.neck = new ItemCollection();
-        this.hands = new ItemCollection();
-        this.torso = new ItemCollection();
-        this.bracers = new ItemCollection();
-        this.leftFinger = new ItemCollection();
-        this.rightFinger = new ItemCollection();
-        this.waist = new ItemCollection();
-        this.legs = new ItemCollection();
-        this.feet = new ItemCollection();
-        this.mainHand = new ItemCollection();
-        this.offHand = new ItemCollection();
+        this.gear = {};
+        this.gear.head = new ItemCollection();
+        this.gear.head.on('change', this.updateGearStatsWithSets, this);
+        this.gear.shoulders = new ItemCollection();
+        this.gear.shoulders.on('change', this.updateGearStatsWithSets, this);
+        this.gear.neck = new ItemCollection();
+        this.gear.neck.on('change', this.updateGearStatsWithSets, this);
+        this.gear.hands = new ItemCollection();
+        this.gear.hands.on('change', this.updateGearStatsWithSets, this);
+        this.gear.torso = new ItemCollection();
+        this.gear.torso.on('change', this.updateGearStatsWithSets, this);
+        this.gear.bracers = new ItemCollection();
+        this.gear.bracers.on('change', this.updateGearStatsWithSets, this);
+        this.gear.leftFinger = new ItemCollection();
+        this.gear.leftFinger.on('change', this.updateGearStatsWithSets, this);
+        this.gear.rightFinger = new ItemCollection();
+        this.gear.rightFinger.on('change', this.updateGearStatsWithSets, this);
+        this.gear.waist = new ItemCollection();
+        this.gear.waist.on('change', this.updateGearStatsWithSets, this);
+        this.gear.legs = new ItemCollection();
+        this.gear.legs.on('change', this.updateGearStatsWithSets, this);
+        this.gear.feet = new ItemCollection();
+        this.gear.feet.on('change', this.updateGearStatsWithSets, this);
+        this.gear.mainHand = new ItemCollection();
+        this.gear.mainHand.on('change', this.updateGearStatsWithSets, this);
+        this.gear.offHand = new ItemCollection();
+        this.gear.offHand.on('change', this.updateGearStatsWithSets, this);
+        this.gear.setBonuses = new ItemCollection();
+        this.gear.setBonuses.on('change', this.updateGearStatsWithoutSets, this);
+
+        this.heroStats = new StatsModel();  // Hero-based stats, used to estimate set bonuses
+        this.baseStats = new StatsModel();  // Default stats and stats after level
+        this.gearStats = new StatsModel();  // Base stats + stats after gear
     },
 
     loadFromHero: function(hero) {
-
-        var items = hero.get('items');
-//        this.items.loadFromHero(hero);
-
         _.each(hero.get('items'), function(itemRaw, slot) {
-            var collection = this[slot];
+            var collection = this.gear[slot];
             if (!collection)
                 return;
 
@@ -41,15 +86,130 @@ var SimulationModel = Backbone.Model.extend({
         this.updateBaseStats(hero);
     },
 
-    getBaseStatsForLevel: function(basestat, level) {
-        var res = {};
+    updateGearStatsWithSets: function() {
+        return this.updateGearStats(true);
+    },
 
-        return {}
+    updateGearStatsWithoutSets: function() {
+        return this.updateGearStats(false);
+    },
+
+    updateGearStats : function(updateSets) {
+        var sets = {};
+        var hasSets = false;
+        var updObj = {};
+        _.each(this.allStats, function(stat) {
+            updObj[stat] = 0;
+        });
+        _.each(this.gear, function(items, slot) {
+            if (!items.length)
+                return;
+            var item = items.at(0);
+            _.each(this.allStats, function(stat) {
+                updObj[stat] += (item.get(stat) || 0);
+            });
+            var setInfo = item.get('set');
+            if (setInfo) {
+                if (sets[setInfo['slug']]) {
+                    sets[setInfo['slug']]++;
+                    hasSets = true;
+                } else {
+                    sets[setInfo['slug']] = 1;
+                }
+            }
+        }, this);
+
+        this.gearStats.set(this.sumStats(this.baseStats.attributes, updObj, this.allStats));
+
+        if (hasSets && updateSets) {
+            var itemRaw = this.diffStats(this.heroStats.attributes, this.gearStats.attributes, this.allStats);
+            var item = new Item(itemRaw);
+            item.set({'name': 'Unknown Set'});
+            item.set({'displayColor': 'green'});
+
+            if (this.gear.setBonuses.length == 0) {
+                this.gear.setBonuses.add(item);
+            } else {
+                this.gear.setBonuses.at(0).clear({silent: true});
+                this.gear.setBonuses.at(0).set(item);
+            }
+        }
+
+        updObj = {};
+        updObj.weapon_dps = 0;
+        var mainHandWeapon = this.gear.mainHand.at(0);
+        if (mainHandWeapon && mainHandWeapon.get('dps') > 0) {
+            updObj.weapon_dph = (mainHandWeapon.get('wmindmg') + mainHandWeapon.get('wmaxdmg')) / 2.0;
+            updObj.weapon_aps = mainHandWeapon.get('attacksPerSecond') * (1 + this.gearStats.get('ias'));
+            updObj.weapon_dps = (updObj.weapon_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) * updObj.weapon_aps;
+            updObj.dps_unbuffed = updObj.weapon_dps *
+                (1 + (this.gearStats.get(this.get('dmgstat')) / 100)) *
+                (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
+        }
+        this.set(updObj);
+    },
+
+    sumStats : function(a, b, stats) {
+        var res = {};
+        _.each(stats, function(stat) {
+            res[stat] = (a[stat] || 0) + (b[stat] || 0);
+        });
+        return res;
+    },
+
+    diffStats : function(a, b, stats) {
+        var res = {};
+        _.each(stats, function(stat) {
+            if (!a[stat])
+                return;
+            res[stat] =  a[stat] - (b[stat] || 0);
+            if (res[stat] < 0.01) {
+                delete res[stat];
+            }
+
+        });
+        return res;
+    },
+
+    heroBaseStatsMappings:{
+        attackSpeed: {to: 'as'},
+        armor: {to: 'def'},
+        strength:{to: 'str'},
+        dexterity:{to: 'dex'},
+        vitality:{to: 'vit'},
+        intelligence:{to: 'int'},
+//        physicalResist:431,
+//        fireResist:390,
+//        coldResist:421,
+//        lightningResist:418,
+//        poisonResist:390,
+//        arcaneResist:390,
+        critDamage:{to: 'cdmg'},
+//        damageIncrease:22.389999389648438,
+        critChance:{to: 'cc'},
+//        damageReduction:0.5502920150756836,
+//        blockChance:0,
+//        thorns:558,
+//        lifeSteal:0,
+//        lifePerKill:0,
+        goldFind:{to: 'gf'},
+        magicFind:{to: 'mf'}
+//        blockAmountMin:0,
+//        blockAmountMax:0,
+//        lifeOnHit:0,
+//        primaryResource:125,
+//        secondaryResource:30
     },
 
     updateBaseStats : function(hero) {
-
         var heroClass = hero.get('class');
+        if (!heroClass)
+            return;
+        var updObj = {};
+        mapAttributesWithSum(hero.get('stats'), updObj, this.heroBaseStatsMappings);
+        updObj.cdmg--;  // there is a total critdamage value (i.e. 100% + gear cdmg bonuses) so we subtract 1 from it
+        this.heroStats.set(updObj);
+
         var absLevel = hero.get('level') + hero.get('paragonLevel');
         var basestat = this.base_stats[heroClass];
 
@@ -61,18 +221,20 @@ var SimulationModel = Backbone.Model.extend({
             return 8 + (level - 1);
         };
 
-        var updateObj = {};
-
-        _.each(this.stats, function(stat) {
-            updateObj['base_' + stat] = statAfterLevel(absLevel, stat, basestat);
+        updObj = {};
+        _.each(this.levelBasedStats, function(stat) {
+            updObj[stat] = statAfterLevel(absLevel, stat, basestat);
         });
-        updateObj.dmgstat = basestat;
-        updateObj.base_cc = 0.05;
-        updateObj.base_cdmg = 0.5;
-        this.set(updateObj);
+        updObj.cc = 0.05;
+        updObj.cdmg = 0.5;
+
+        this.set({dmgstat: basestat});
+        this.baseStats.set(updObj);
     },
 
-    stats: ['str', 'dex', 'int', 'vit'],
+    allStats: ['str', 'dex', 'int', 'vit', 'cc', 'cdmg', 'mindmg', 'maxdmg', 'deltadmg', 'ias', 'weapon_dps'],
+
+    levelBasedStats: ['str', 'dex', 'int', 'vit'],
 
     base_stats: {
         'demon-hunter': 'dex',
@@ -80,23 +242,7 @@ var SimulationModel = Backbone.Model.extend({
         'wizard': 'int'
     },
 
-    statsPerLevel: {
-        'demon-hunter': {
-            'dex': 3,
-            'vit': 2,
-            'int': 1,
-            'str': 1
-        },
-        'monk': {
-            'dex': 3,
-            'vit': 2,
-            'int': 1,
-            'str': 1
-        }
-    },
-
     'defaults' : {
-        'base_dex': 0,
         'dmgstat': 'dex'
     }
 });
@@ -112,55 +258,97 @@ var Item = Backbone.Model.extend({
 
         var self = this;
 
-        this.set({loading: true});
+        this.set({loading: this.get('loading') + 1});
         $.ajax({
             url:self.url + itemId,
             dataType:"jsonp",
             success:function (data) {
                 if (!data.name) {
-                    self.set({loading:false, loadingFailed: true, lastTriedItemId: itemId});
+                    self.set({loading:self.get('loading') - 1, loadingFailed: true, lastTriedItemId: itemId});
                     return;
                 }
-                self.set({loading:false, loadingFailed: false});
+                self.set({loading:self.get('loading') - 1, loadingFailed: false});
                 self.updateStats(data);
             }, error: function() {
-                self.set({loading:false, loadingFailed: true, lastTriedItemId: itemId});
+                self.set({loading:self.get('loading') - 1, loadingFailed: true, lastTriedItemId: itemId});
             }
         });
     },
 
     updateStats: function(data) {
-        var res = {};
-        this.mapAttributes(data.attributesRaw, res, this.dataMappings);
+        var updObj = {};
+        mapAttributesWithSum(data.attributesRaw, updObj, this.attributesRawDataMappings);
         _.each(data.gems, function (gem) {
-            this.mapAttributes(gem.attributesRaw, res, this.dataMappings);
+            mapAttributesWithSum(gem.attributesRaw, updObj, this.attributesRawDataMappings);
         }, this);
+        mapAttributesWithSum(data, updObj, this.commonDataMappings);
+        updObj.type = data.type.id;
+        updObj.twoHanded = data.type.twoHanded;
+        updObj.set = data.set;
+        updObj.tooltipParams = data.tooltipParams;
 
-        if (res.mindmg > 0 && res.ddmg > 0)
-            res.maxdmg = res.mindmg + res.ddmg;
+        if (data.dps) { // calc weapon stats
+            var js_wd_phys_min = 0;
+            var js_wd_phys_delta = 0;
+            var js_wd_elem_min = 0;
+            var js_wd_elem_delta = 0;
+            var js_wd_phys_bon_min = updObj.wdbonusmin || 0;
+            var js_wd_phys_bon_delta = updObj.wdbonusdelta || 0;
+            var js_wd_phys_bon_perc = 0;
 
-        res.tooltipParams = data.tooltipParams;
-        this.set(res);
+            _.each(data.attributesRaw, function(obj, attr) {
+                var val = obj['min'];
+                if (attr == 'Damage_Weapon_Min#Physical')
+                    js_wd_phys_min = val;
+                else if (attr == 'Damage_Weapon_Delta#Physical')
+                    js_wd_phys_delta = val;
+                else if (attr == 'Damage_Weapon_Percent_Bonus#Physical')
+                    js_wd_phys_bon_perc = val;
+                else if (attr.match('^Damage_Weapon_Min#') && !attr.match('#Physical$'))
+                    js_wd_elem_min = val;
+                else if (attr.match('^Damage_Weapon_Delta#') && !attr.match('#Physical$'))
+                    js_wd_elem_delta = val;
+            });
+
+            var wd_phys_min = js_wd_phys_min + js_wd_phys_bon_min;
+            var minDmg = Math.round(wd_phys_min * (1 + js_wd_phys_bon_perc) + js_wd_elem_min);
+
+            var wd_phys_max_base = js_wd_phys_min + js_wd_phys_delta;
+            if (wd_phys_max_base < wd_phys_min)
+                wd_phys_max_base = wd_phys_min + 1;
+            var maxDmg = Math.round((wd_phys_max_base + js_wd_phys_bon_delta) * (1 + js_wd_phys_bon_perc)
+                + js_wd_elem_min + js_wd_elem_delta);
+
+            updObj.wmindmg = minDmg;
+            updObj.wmaxdmg = maxDmg;
+        }
+
+        if (updObj.mindmg && updObj.deltadmg)
+            updObj.maxdmg = updObj.mindmg + updObj.deltadmg;
+
+        this.set(updObj);
     },
 
-    mapAttributes: function(from, to, map) {
-        _.each(from, function(v, k) {
-            if (map[k]) {
-                if (!to[map[k].to])
-                    to[map[k].to] = 0;
-                to[map[k].to] += v[map[k].attr];
-//                to[map[k].to] = to[map[k].to].toFixed(2);
-            }
-        });
+    commonDataMappings: {
+        'attacksPerSecond': {to: 'attacksPerSecond', attr: 'min'},
+        'dps': {to: 'dps', attr: 'min'},
+        'minDamage': {to: 'minDamage', attr: 'min'},
+        'maxDamage': {to: 'maxDamage', attr: 'min'}
     },
 
-    dataMappings: {
+    attributesRawDataMappings: {
         'Dexterity_Item': {to: 'dex', attr: 'min'},
+        'Vitality_Item': {to: 'vit', attr: 'min'},
+        'Intelligence_Item': {to: 'int', attr: 'min'},
+        'Strength_Item': {to: 'str', attr: 'min'},
         'Crit_Percent_Bonus_Capped': {to: 'cc', attr: 'min'},
         'Crit_Damage_Percent': {to: 'cdmg', attr: 'min'},
         'Attacks_Per_Second_Percent': {to: 'ias', attr: 'min'},
         'Damage_Min#Physical': {to: 'mindmg', attr: 'min'},
-        'Damage_Delta#Physical' : {to: 'ddmg', attr: 'min'}
+        'Damage_Delta#Physical' : {to: 'deltadmg', attr: 'min'},
+        'Damage_Weapon_Bonus_Min#Physical' : {to: 'wdbonusmin'},
+        'Damage_Weapon_Bonus_Delta#Physical' : {to: 'wdbonusdelta'}
+
     },
 
     defaults : {
@@ -174,8 +362,12 @@ var Item = Backbone.Model.extend({
         cdmg:   0,
         ias:    0,
         mindmg: 0,
-        ddmg:   0,
-        maxdmg: 0
+        deltadmg:   0,
+        maxdmg: 0,
+        set: null,
+        displayColor: 'grey',
+        tooltipParams: null,
+        loading: 0
 //        base_resist:  0,
 //        base_dodge:   0,
 //        extra_life:   0,

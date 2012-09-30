@@ -1,6 +1,107 @@
-var renderPercent = function(elem, n, digits) {
-    if (n > 0.0)
-        elem.text((n * 100).toFixed(digits) + '%');
+var renderSettings = {
+    "dps":{
+        "prefix":'',
+        "postfix":"DPS",
+        "precision":1,
+        "percent":false
+    },
+    "dps_unbuffed": {
+        "prefix":'',
+        "postfix":"DPS",
+        "precision":2,
+        "percent":false
+    },
+    "dex":{
+        "prefix":'+',
+        "postfix":"Dex",
+        "precision":0,
+        "percent":false
+    },
+    "vit":{
+        "prefix":'+',
+        "postfix":"Vit",
+        "precision":0,
+        "percent":false
+    },
+    "str":{
+        "prefix":'+',
+        "postfix":"Str",
+        "precision":0,
+        "percent":false
+    },
+    "int":{
+        "prefix":'+',
+        "postfix":"Int",
+        "precision":0,
+        "percent":false
+    },
+    "cc":{
+        "prefix":'+',
+        "postfix":"CC",
+        "precision":1,
+        "percent":true
+    },
+    "cdmg":{
+        "prefix":'+',
+        "postfix":"CD",
+        "precision":0,
+        "percent":true
+    },
+    "ias":{
+        "prefix":'+',
+        "postfix":"AS",
+        "precision":0,
+        "percent":true
+    },
+    "mindmg":{
+        "prefix":'+',
+        "postfix":"Min",
+        "precision":0,
+        "percent":false
+    },
+    "maxdmg":{
+        "prefix":'+',
+        "postfix":"Max",
+        "precision":0,
+        "percent":false
+    },
+    "deltadmg":{
+        "prefix":'+',
+        "postfix":"Delta",
+        "precision":0,
+        "percent":false
+    },
+    "weapon_dps":{
+        "prefix":'',
+        "postfix":"DPS",
+        "precision":1,
+        "percent":false
+    },
+    "weapon_aps":{
+        "prefix":'',
+        "postfix":"",
+        "precision":2,
+        "percent":false
+    }
+
+};
+
+var renderStat = function (val, settings) {
+    if (val) {
+        if (settings.percent)
+            val *= 100;
+        return settings.prefix + val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ') + settings.postfix;
+    }
+    return undefined;
+};
+
+var renderStatValue = function (val, settings) {
+    if (val != undefined) {
+        if (settings.percent)
+            val *= 100;
+        return val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ');
+    }
+    return undefined;
 };
 
 window.HeroStatsView = Backbone.View.extend({
@@ -16,51 +117,70 @@ window.HeroStatsView = Backbone.View.extend({
         var self = this;
 
         this.simulationModel = new SimulationModel();
-        this.simulationModel.head.on('add remove', function() { self.renderSlot($('.item-slot-head', self.el), this, self) });
-        this.simulationModel.shoulders.on('add remove', function() { self.renderSlot($('.item-slot-shoulders', self.el), this, self) });
-        this.simulationModel.neck.on('add remove', function() { self.renderSlot($('.item-slot-neck', self.el), this, self) });
-        this.simulationModel.hands.on('add remove', function() { self.renderSlot($('.item-slot-hands', self.el), this, self) });
-        this.simulationModel.torso.on('add remove', function() { self.renderSlot($('.item-slot-torso', self.el), this, self) });
-        this.simulationModel.bracers.on('add remove', function() { self.renderSlot($('.item-slot-bracers', self.el), this, self) });
-        this.simulationModel.leftFinger.on('add remove', function() { self.renderSlot($('.item-slot-leftFinger', self.el), this, self) });
-        this.simulationModel.rightFinger.on('add remove', function() { self.renderSlot($('.item-slot-rightFinger', self.el), this, self) });
-        this.simulationModel.waist.on('add remove', function() { self.renderSlot($('.item-slot-waist', self.el), this, self) });
-        this.simulationModel.legs.on('add remove', function() { self.renderSlot($('.item-slot-legs', self.el), this, self) });
-        this.simulationModel.feet.on('add remove', function() { self.renderSlot($('.item-slot-feet', self.el), this, self) });
-        this.simulationModel.mainHand.on('add remove', function() { self.renderSlot($('.item-slot-mainHand', self.el), this, self) });
-        this.simulationModel.offHand.on('add remove', function() { self.renderSlot($('.item-slot-offHand', self.el), this, self) });
+        _.each(this.simulationModel.gear, function (items, slot) {
+            items.on('add remove', function () {
+                self.renderSlot($('.item-slot-' + slot, self.el), this, self)
+            });
+        });
+//
+//        this.simulationModel.baseStats.on('change', function () {
+//            this.renderStats(this.simulationModel.baseStats,
+//                [this.simulationModel.get('dmgstat')].concat(this.displayBaseStats), $('#base-stats', this.el));
+//        }, this);
+
+        this.simulationModel.gearStats.on('change', function() {
+            this.renderStats(this.simulationModel.gearStats,
+                [this.simulationModel.get('dmgstat')].concat(this.displayGearStats), $('#gear-stats', this.el));
+        }, this);
 
         this.simulationModel.on('change', function() {
-            this.renderBase();
+            this.renderStats(this.simulationModel, this.displayDamageStats, $('#dmg-stats', this.el));
         }, this);
     },
 
-    renderSlot: function (slotEl, items, mainModel) {
+    renderSlot:function (slotEl, items, mainModel) {
         $('.item', slotEl).remove();
 
-        items.each(function(item, n) {
-            var itemView = n ? new ItemView({model: {dmgstat: mainModel.simulationModel.get('dmgstat'), item: item}})
-                    : new EquippedItemView({model: {dmgstat: mainModel.simulationModel.get('dmgstat'), item: item}}); // the first item is equipped
+        items.each(function (item, n) {
+            var itemView = n ? new ItemView({model:{dmgstat:mainModel.simulationModel.get('dmgstat'), item:item}})
+                : new EquippedItemView({model:{dmgstat:mainModel.simulationModel.get('dmgstat'), item:item}}); // the first item is equipped
             slotEl.append(itemView.render().el);
         });
     },
 
-    updateSimulationModel: function(hero) {
+    updateSimulationModel:function (hero) {
         this.simulationModel.loadFromHero(hero);
     },
 
-    updatePage: function () {
+    updatePage:function () {
         var page = this.model.get('page');
         $('li', this.el).removeClass('active');
         $('.' + page, this.el).addClass('active');
     },
 
-    renderBase: function() {
-        var dmgstat = this.simulationModel.get('dmgstat');
-        $('.dmg_stat_name', this.el).text(dmgstat);
-        $('.base_dmg_stat', this.el).text(this.simulationModel.get('base_' + dmgstat));
-        renderPercent($('.base_cc_stat', this.el), this.simulationModel.get('base_cc'), 1);
-        renderPercent($('.base_cdmg_stat', this.el), this.simulationModel.get('base_cdmg'), 0);
+    renderStats:function (stats, statsToRender, $el) {
+        $('li', $el).not('.section-header').remove();
+        _.each(statsToRender, function (stat) {
+            var statVal = stats.get(stat);
+            $('<li/>').append($('<span/>').addClass('stat-name').text(this.statsNames[stat]))
+                .append($('<span/>').text(renderStatValue(statVal, renderSettings[stat]))).appendTo($el);
+        }, this);
+    },
+
+    displayBaseStats:['cc', 'cdmg'],
+    displayGearStats:['cc', 'cdmg', 'ias', 'mindmg', 'maxdmg'],
+    displayDamageStats:['weapon_dps', 'weapon_aps', 'dps_unbuffed'],
+    statsNames:{
+        'dex': 'Dexterity',
+        'cc': 'Critical Chance',
+        'cdmg': 'Critical Damage',
+        'ias': 'Attack Speed Increase',
+        'mindmg': 'Minimal Damage',
+        'maxdmg': 'Maximal Damage',
+        'deltadmg': 'Delta Damage',
+        'weapon_dps': 'Weapon DPS',
+        'weapon_aps': 'Weapon APS',
+        'dps_unbuffed': 'DPS Unbuffed'
     },
 
     render:function () {
@@ -75,53 +195,53 @@ window.HeroStatsView = Backbone.View.extend({
 //        this.updatePage();
 //        this.renderHeadSlot();
 
-/*
-        _.each(this.model.hero.get('items'), function(item, slot) {
-            $('<li/>').addClass('nav-header').text(slot).appendTo($('#gear', this.el));
+        /*
+         _.each(this.model.hero.get('items'), function(item, slot) {
+         $('<li/>').addClass('nav-header').text(slot).appendTo($('#gear', this.el));
 
-//            $('<span/>').attr('data-d3tooltip', 'http://eu.battle.net/d3/en/' + item.tooltipParams).text(item.name).appendTo(itemLi);
-            $('<strong/>').text(item.name).appendTo(itemLi);
-            itemLi.appendTo($('#gear', this.el))
-        }, this);*/
-/*
-        _.each(this.model.get('heroes'), function (hero) {
-            var itemEl = this.itemTemplate({
-                'profileBattletag': this.model.get('battleTag'),
-                'profileBattletagSafe': this.model.get('battleTagSafe'),
-                'heroId': hero.id,
-                'heroName': hero.name,
-                'heroLevel': hero.level,
-                'heroParagonLevel': hero.paragonLevel,
-                'heroClass': hero.class
-            });
+         //            $('<span/>').attr('data-d3tooltip', 'http://eu.battle.net/d3/en/' + item.tooltipParams).text(item.name).appendTo(itemLi);
+         $('<strong/>').text(item.name).appendTo(itemLi);
+         itemLi.appendTo($('#gear', this.el))
+         }, this);*/
+        /*
+         _.each(this.model.get('heroes'), function (hero) {
+         var itemEl = this.itemTemplate({
+         'profileBattletag': this.model.get('battleTag'),
+         'profileBattletagSafe': this.model.get('battleTagSafe'),
+         'heroId': hero.id,
+         'heroName': hero.name,
+         'heroLevel': hero.level,
+         'heroParagonLevel': hero.paragonLevel,
+         'heroClass': hero.class
+         });
 
-            $('ul', this.el).append(itemEl);
-//            $('a', this.el).attr('href', "#profile/" + this.model.get('battleTagSafe'));
+         $('ul', this.el).append(itemEl);
+         //            $('a', this.el).attr('href', "#profile/" + this.model.get('battleTagSafe'));
 
 
-        }, this);*/
+         }, this);*/
 
         return this;
     }/*,
 
-    sumbitBtnClick:function () {
-        Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""), {'trigger': true});
-    }  */
+     sumbitBtnClick:function () {
+     Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""), {'trigger': true});
+     }  */
 
 });
 
 window.ItemView = Backbone.View.extend({
 
-    tagName: 'tr',
+    tagName:'tr',
 
-    className: 'item',
+    className:'item',
 
-    initialize: function() {
+    initialize:function () {
         this.model.on('change', this.render, this);
         this.template = _.template($('#item-template').html());
     },
 
-    render: function() {
+    render:function () {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     }
@@ -130,17 +250,17 @@ window.ItemView = Backbone.View.extend({
 
 window.EquippedItemView = Backbone.View.extend({
 
-    tagName: 'li',
+    tagName:'li',
 
-    className: 'item',
+    className:'item',
 
-    initialize: function() {
+    initialize:function () {
         this.model.item.on('change', this.render, this);
 
         this.template = _.template($('#equipped-item-template').html());
     },
 
-    render: function() {
+    render:function () {
         this.$el.html(this.template(this.model.item.toJSON()));
 
         var self = this;
@@ -151,8 +271,8 @@ window.EquippedItemView = Backbone.View.extend({
                 .text(this.model.item.get("name"))
         ).appendTo(this.$el);
 
-        $('<span/>').text($.map(this.renderSettings, function(v, k) {
-            return self.renderStat(self.model.item.get(k), v);
+        $('<span/>').text($.map(renderSettings,function (v, k) {
+            return renderStat(self.model.item.get(k), v);
         }).join(', ')).appendTo(this.$el);
 
 //        $("<a/>").addClass("btn btn-mini btn-info").append(
@@ -167,53 +287,7 @@ window.EquippedItemView = Backbone.View.extend({
 //        this.renderStat($('.mindmg', this.el), this.model.item.get('mindmg'));
 //        this.renderStat($('.maxdmg', this.el), this.model.item.get('maxdmg'));
         return this;
-    },
-
-    renderSettings: {
-        "dex": {
-            "postfix" : "Dex",
-            "precision": 0,
-            "percent": false
-        },
-        "vit": {
-            "postfix" : "Vit",
-            "precision": 0,
-            "percent": false
-        },
-        "str": {
-            "postfix" : "Str",
-            "precision": 0,
-            "percent": false
-        },
-        "int": {
-            "postfix" : "Int",
-            "precision": 0,
-            "percent": false
-        },
-        "cc": {
-            "postfix" : "CC",
-            "precision": 1,
-            "percent": true
-        },
-        "cdmg": {
-            "postfix" : "CDmg",
-            "precision": 0,
-            "percent": true
-        },
-        "ias": {
-            "postfix" : "IAS",
-            "precision": 2,
-            "percent": true
-        }
-    },
-
-    renderStat: function(val, settings) {
-        if (val > 0) {
-            if (settings.percent)
-                val *= 100;
-            return "+" + val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ') + settings.postfix;
-        }
-        return undefined;
     }
+
 
 });

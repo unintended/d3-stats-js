@@ -166,80 +166,25 @@
                         <li class="section-header">Feet</li>
                     </ul>
                 </div>
+                <div class="well well-small">
+                    <ul class="table-list item-slot-setBonuses">
+                        <li class="section-header">Set Bonuses</li>
+                    </ul>
+                </div>
             </div>
 
-        <!--<table class="table table-condensed" >
-            <thead>
-            <tr>
-                <th>&nbsp;</th>
-                <th><%= dmgstat %></th>
-                <th>Crit Chance</th>
-                <th>Crit Damage</th>
-                <th>IAS</th>
-                <th>Min Dmg</th>
-                <th>Max Dmg</th>
-                <th>&nbsp;</th>
-            </tr>
-            </thead>
-            <tbody class="item-slot-head">
-                <tr><td class="section-header">Head</td><td span="7"><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-shoulders">
-                <tr><td class="section-header">Shoulders</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-neck">
-                <tr><td class="section-header">Neck</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-hands">
-                <tr><td class="section-header">Hands</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-torso">
-                <tr><td class="section-header">Torso</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-bracers">
-                <tr><td class="section-header">Bracers</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-leftFinger">
-                <tr><td class="section-header">Left Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-rightFinger">
-                <tr><td class="section-header">Right Finger</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-waist">
-                <tr><td class="section-header">Waist</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-legs">
-                <tr><td class="section-header">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-feet">
-                <tr><td class="section-header">Legs</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-mainHand">
-                <tr><td class="section-header">Main Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-            <tbody class="item-slot-offHand">
-                <tr><td class="section-header">Off Hand</td><td><a class="btn btn-mini btn-success" href="#"><span class="icon-plus icon-white"></span></a></td></tr>
-            </tbody>
-        </table>-->
-
-            <div class="span3 well well-small">
-                <ul class="table-list">
+            <div class="span4 well well-small">
+                <!--<ul class="table-list" id="base-stats">
                     <li class="section-header">Base Stats</li>
-                    <li><span class="item-name dmg_stat_name"></span><span class="base_dmg_stat"></span></li>
-                    <li><span class="item-name">Crit Chance</span><span class="base_cc_stat"></span></li>
-                    <li><span class="item-name">Crit Damage</span><span class="base_cdmg_stat"></span></li>
+                </ul>-->
+                <ul class="table-list" id="gear-stats">
+                    <li class="section-header">Common Stats</li>
                 </ul>
-<!--                <dl class="dl-horizontal">
-                    <dt class="dmg_stat_name"></dt>
-                    <dd class="base_dmg_stat"></dd>
-                    <dt>Crit Chance</dt>
-                    <dd class="base_cc_stat"></dd>
-                    <dt>Crit Damage</dt>
-                    <dd class="base_cdmg_stat"></dd>
-                </dl>-->
+                <ul class="table-list" id="dmg-stats">
+                    <li class="section-header">Damage</li>
+                </ul>
             </div>
         </div>
-
     </script>
 
     <script type="text/template" id="equipped-item-template">
