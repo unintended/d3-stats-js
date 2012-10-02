@@ -4,20 +4,19 @@ window.SelectHeroView = Backbone.View.extend({
 
     initialize:function () {
         console.log('Initializing Select Hero View');
-
-        this.model.profile.bind("change", this.render, this);
-
         this.template = _.template($('#select-hero-template').html());
         this.itemTemplate = _.template($('#select-hero-item-template').html());
+
+        this.model.bind("change", this.render, this);
     },
 
     render:function () {
         $(this.el).html(this.template());
 
         var self = this;
-        var battleTag = this.model.profile.get('battleTagSafe');
+        var battleTag = this.model.get('battleTagSafe');
 
-        _.each(this.model.profile.get('heroes'), function (hero) {
+        _.each(this.model.get('heroes'), function (hero) {
             var elHtml = self.itemTemplate({
                 'heroName': hero.name,
                 'heroLevel': hero.level,
@@ -27,9 +26,8 @@ window.SelectHeroView = Backbone.View.extend({
             var itemEl = $(elHtml);
             $('a', itemEl).click(function(event) {
                 event.preventDefault();
-                Backbone.history.navigate('hero/' + battleTag + '/' + hero.id, {trigger: true});
-//                self.model.hero.loadHero(battleTag, hero.id);
-            });
+                this.trigger('heroSelected', hero.id);
+            }, this);
             $('ul', self.el).append(itemEl);
         });
 

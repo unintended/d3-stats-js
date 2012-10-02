@@ -42,46 +42,16 @@ window.HeroCollection = Backbone.Collection.extend({
     model: Hero
 });
 
-window.Profile = Backbone.Model.extend({
-
-    url: "http://eu.battle.net/api/d3/profile/",
-
-    initialize:function () {
-        this.loading = false;
-    },
-
-    loadProfile: function (battletag) {
-        battletag = battletag.replace('#', '-').replace(/\s/g, "");
-
-        this.clear();
-        this.set({loading: true});
-
-        var url = this.url + battletag + '/';
-        console.log('fetch profile: ' + url);
-        var self = this;
-        $.ajax({
-            url:url,
-            dataType:"jsonp",
-            success:function (data) {
-                if (!data.battleTag) {
-                    self.set({loading:false, profileLoadingFailed: true, lastTriedBattleTag: battletag});
-                    return;
-                }
-                self.set({loading:false,
-                    profileLoadingFailed: false,
-                    battleTag: data.battleTag,
-                    battleTagSafe: data.battleTag.replace('#', '-'),
-                    heroes: data.heroes});
-            }, error: function() {
-                self.set({loading:false, profileLoadingFailed: true, lastTriedBattleTag: battletag});
-            }
-        });
-    }
-});
-
 window.MainModel = Backbone.Model.extend({
 
     profileUrl: "http://eu.battle.net/api/d3/profile/",
+
+    defaults: {
+        'region': 'eu',
+        'battleTag': null,
+        'battleTagSafe': null,
+        'heroId': null
+    },
 
     initialize: function() {
 //        this.battleTag = null;
@@ -89,7 +59,7 @@ window.MainModel = Backbone.Model.extend({
         var self = this;
 
         this.profile = new Profile();
-        this.profile.url = this.profileUrl; // TODO: a good place to add support for international servers
+//        this.profile.url = this.profileUrl; // TODO: a good place to add support for international servers
 //        this.profile.on('change:battleTagSafe', function(profile) {
 //            Backbone.history.navigate('profile/' + profile.get('battleTagSafe'));
 //        });
@@ -107,10 +77,6 @@ window.MainModel = Backbone.Model.extend({
 
 //        this.on('change:battleTag', this.loadProfile);
 //        this.on('change:profile', this.updateHeroes)
-    },
-
-    defaults: {
-        "page":  "damage"
     }
 
     /*loadProfile: function(battletag) {

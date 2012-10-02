@@ -97,20 +97,40 @@
     </script>
 
     <div id="welcome-template">
+        <div id="alert-holder"></div>
         <h2>Welcome!</h2>
+        <p></p>
+
+        <p>Select your region:</p>
+
+        <p></p>
+        <div>
+            <select id="region_input">
+                <option value="eu" selected="selected">Europe</option>
+                <option value="us">USA</option>
+                <option value="kr">Korea</option>
+                <option value="tw">Taiwan</option>
+            </select>
+        </div>
 
         <p></p>
 
-        <p>Start by typing your battletag here:</p>
+        <p>And start by typing your battletag here:</p>
 
         <p></p>
 
         <div class="form-inline">
             <input id="bt_input" type="text" class="input-large" placeholder="Battletag">
             <button id="bt_submit" type="submit" class="btn btn-primary">Continue</button>
-
         </div>
     </div>
+
+    <script type="text/template" id="alert-template">
+        <div class="alert alert-error fade in">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong><%= title %></strong> <%= text %>
+        </div>
+    </script>
 
     <script type="text/template" id="hero-stats-template">
         <ul class="nav nav-tabs">
@@ -228,6 +248,7 @@
     </script -->
 </div>
 
+<script src="js/Model/Profile.js" type="text/javascript"></script>
 <script src="js/Model/Hero.js" type="text/javascript"></script>
 <script src="js/Model/Item.js" type="text/javascript"></script>
 <script src="js/View/HeaderView.js" type="text/javascript"></script>
@@ -236,6 +257,7 @@
 <script src="js/View/SelectHeroView.js" type="text/javascript"></script>
 <script src="js/View/HeroStatsView.js" type="text/javascript"></script>
 <script src="js/main.js" type="text/javascript"></script>
+
 
 </body>
 </html>

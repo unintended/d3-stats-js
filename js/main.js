@@ -16,6 +16,7 @@ window.Router = Backbone.Router.extend({
 //        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
         this.headerView = new HeaderView({model: this.model});
         $('.header').html(this.headerView.render().el);
+//        this.mainView = new MainView({model: this.model});
     },
 
 //    profileChanged: function() {
@@ -47,18 +48,26 @@ window.Router = Backbone.Router.extend({
         this.model.profile.clear();
         this.model.hero.clear();
 
-        if (!this.homeView) {
-            this.homeView = new HomeView({model: this.model});
-            this.homeView.render();
-        } else {
-            this.homeView.render();
-            this.homeView.delegateEvents(); // delegate events when the view is recycled
-        }
+//        if (!this.homeView) {
+//            this.homeView = new HomeView();
+//            this.homeView.render();
+//
+//        } else {
+//            this.homeView.render();
+//            this.homeView.delegateEvents(); // delegate events when the view is recycled
+//        }
+
+        this.homeView = new HomeView();
+        this.homeView.render();
+        this.homeView.on('profileLoaded', function(profile) {
+            this.profile(profile);
+        }, this);
+
         $("#content").html(this.homeView.el);
     },
 
-    profile: function(battletag) {
-        this.model.profile.loadProfile(battletag);
+    profile: function(profile) {
+//        this.model.profile.loadProfile(battletag);
 //        this.hero.clear();
 //        this.profile.loadProfileForId(profile);
 //
@@ -70,6 +79,20 @@ window.Router = Backbone.Router.extend({
 //        }
 //
 //        $("#content").html(this.selectHeroView.el);
+
+        this.model.set({
+            'region': profile.get('region'),
+            'battleTag': profile.get('battleTag'),
+            'heroes': profile.get('battleTag')
+        });
+        this.selectHeroView = new SelectHeroView({model: profile});
+        this.selectHeroView.render();
+        this.selectHeroView.on('heroSelected', function(heroId) {
+            this.hero(heroId);
+//            this.profile(profile);
+        }, this);
+
+        $("#content").html(this.selectHeroView.el);
     },
 
     hero: function(battletag, heroId) {
