@@ -9,10 +9,8 @@ window.Profile = Backbone.Model.extend({
 
     defaults: {
         'loading': false,
-        'loaded': false,
-        'lastTriedBattleTag': null,
         'region' : 'eu',
-        'battleTag' : null
+        'battleTag' : undefined
     },
 
     initialize:function () {
@@ -20,9 +18,9 @@ window.Profile = Backbone.Model.extend({
 
     loadProfile: function (battletag, region) {
         battletag = battletag.replace('#', '-').replace(/\s/g, "");
-        region = region || this.get('region');
+        region = region || this.defaults.region;
 
-        this.clear();
+        this.clear({silent: true});
         this.set({loading: true});
 
         var url = this.url[region] + battletag + '/';
@@ -33,17 +31,17 @@ window.Profile = Backbone.Model.extend({
             dataType:"jsonp",
             success:function (data) {
                 if (!data.battleTag) {
-                    self.set({loading:false, loaded: false, lastTriedBattleTag: battletag});
+                    self.set({loading: false});
                     return;
                 }
                 self.set({loading:false,
-                    loaded: true,
                     region: region,
                     battleTag: data.battleTag,
                     battleTagSafe: data.battleTag.replace('#', '-'),
-                    heroes: data.heroes});
+                    heroes: data.heroes
+                });
             }, error: function() {
-                self.set({loading:false, loaded: false, lastTriedBattleTag: battletag});
+                self.set({loading:false});
             }
         });
     }

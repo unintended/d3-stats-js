@@ -15,6 +15,9 @@ window.Router = Backbone.Router.extend({
 //        this.hero = new Hero();
 //        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
         this.headerView = new HeaderView({model: this.model});
+        this.headerView.on('battleTagClicked', function() {
+            this.selectHero(this.profile);
+        }, this);
         $('.header').html(this.headerView.render().el);
 //        this.mainView = new MainView({model: this.model});
     },
@@ -43,8 +46,7 @@ window.Router = Backbone.Router.extend({
 //    },
 
     welcome: function() {
-//        this.model.clear();
-
+        this.model.clear();
         this.model.profile.clear();
         this.model.hero.clear();
 
@@ -67,38 +69,23 @@ window.Router = Backbone.Router.extend({
     },
 
     profile: function(profile) {
-//        this.model.profile.loadProfile(battletag);
-//        this.hero.clear();
-//        this.profile.loadProfileForId(profile);
-//
-//        if (!this.selectHeroView) {
-//            this.selectHeroView = new SelectHeroView({model: this.profile});
-//            this.selectHeroView.render();
-//        } else {
-//            this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
-//        }
-//
-//        $("#content").html(this.selectHeroView.el);
-
         this.model.set({
             'region': profile.get('region'),
             'battleTag': profile.get('battleTag'),
-            'heroes': profile.get('battleTag')
+            'battleTagSafe': profile.get('battleTagSafe'),
+            'heroId': null
         });
-        this.selectHeroView = new SelectHeroView({model: profile});
-        this.selectHeroView.render();
-        this.selectHeroView.on('heroSelected', function(heroId) {
-            this.hero(heroId);
-//            this.profile(profile);
-        }, this);
 
-        $("#content").html(this.selectHeroView.el);
+        // copy profile
+        this.model.profile.clear({'silent': true});
+        this.model.profile.set(profile.attributes);
+
+        this.selectHero(profile);
     },
 
     hero: function(battletag, heroId) {
-        this.model.profile.clear();
         this.model.hero.clear();
-        this.model.profile.loadProfile(battletag);
+//        this.model.profile.loadProfile(battletag);
 
         if (!this.heroStatsView) {
             this.heroStatsView = new HeroStatsView({model: this.model});
@@ -119,8 +106,21 @@ window.Router = Backbone.Router.extend({
 //        }
 //
 //        $("#content").html(this.heroStatsView.el);
-    }
+    },
 
+    selectHero: function(profile) {
+        this.selectHeroView = new SelectHeroView({model: profile});
+        this.selectHeroView.render();
+        this.selectHeroView.on('heroSelected', function(heroId) {
+//            this.hero(heroId);
+        }, this);
+
+        $("#content").html(this.selectHeroView.el);
+    },
+
+    calcHero: function(heroId) {
+
+    }
 
 });
 

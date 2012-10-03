@@ -1,6 +1,8 @@
 window.HomeView = Backbone.View.extend({
 
-    className: "hero-unit",
+//    className: "hero-unit",
+
+//    className: "row-fluid",
 
     initialize:function () {
         console.log('Initializing Home View');
@@ -8,6 +10,7 @@ window.HomeView = Backbone.View.extend({
         this.alertTemplate = _.template($('#alert-template').html());
         this.model = new Profile();
         this.model.on('change:loading', this.onLoadingChange, this);
+        this.model.on('change:error change:battleTag', this.onLoadingChange, this);
     },
 
     events: {
@@ -24,7 +27,7 @@ window.HomeView = Backbone.View.extend({
         this.renderLoading();
 
         if (!this.model.get('loading')) {
-            if (this.model.get('loaded')) {
+            if (this.model.get('battleTag')) {
                 this.trigger('profileLoaded', this.model);
             } else {
                 var $ah = $('#alert-holder');
@@ -43,7 +46,10 @@ window.HomeView = Backbone.View.extend({
     },
 
     sumbitBtnClick:function () {
-        this.model.loadProfile($('#bt_input').val(), $('#region_input').val());
+        var btValue = $('#bt_input').val();
+        if (!btValue || btValue == '')
+            return;
+        this.model.loadProfile(btValue, $('#region_input').val());
 //        Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""), {'trigger': true});
     }
 

@@ -48,9 +48,9 @@ window.MainModel = Backbone.Model.extend({
 
     defaults: {
         'region': 'eu',
-        'battleTag': null,
-        'battleTagSafe': null,
-        'heroId': null
+        'battleTag': undefined,
+        'battleTagSafe': undefined,
+        'heroId': undefined
     },
 
     initialize: function() {
