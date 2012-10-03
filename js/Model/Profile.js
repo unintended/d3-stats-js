@@ -32,6 +32,7 @@ window.Profile = Backbone.Model.extend({
             success:function (data) {
                 if (!data.battleTag) {
                     self.set({loading: false});
+                    self.trigger("error");
                     return;
                 }
                 self.set({loading:false,
@@ -40,8 +41,10 @@ window.Profile = Backbone.Model.extend({
                     battleTagSafe: data.battleTag.replace('#', '-'),
                     heroes: data.heroes
                 });
+                self.trigger("load");
             }, error: function() {
                 self.set({loading:false});
+                self.trigger("error");
             }
         });
     }

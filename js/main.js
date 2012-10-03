@@ -2,126 +2,92 @@ window.Router = Backbone.Router.extend({
 
     routes: {
         "": "welcome",
-        "profile/:profile": "profile",
-        "hero/:profile/:hero": "hero",
-        "hero/:profile/:hero/:page": "hero"
+        "profile/:region/:profile": "routeProfile",
+        "hero/:region/:profile/:hero": "routeHero",
+        "hero/:region/:profile/:hero/:page": "routeHero"
     },
 
     initialize: function () {
         this.model = new MainModel();
-//        this.model.profile.on('change', this.profileChanged, this);
-//        this.model.hero.on('change', this.heroChanged, this);
-//        this.profile = new Profile();
-//        this.hero = new Hero();
-//        this.headerView = new HeaderView({model: {'profile': this.profile, 'hero': this.hero}});
+        this.loadingTemplate = _.template($('#loading-template').html());
+
         this.headerView = new HeaderView({model: this.model});
         this.headerView.on('battleTagClicked', function() {
             this.selectHero(this.profile);
         }, this);
         $('.header').html(this.headerView.render().el);
-//        this.mainView = new MainView({model: this.model});
     },
-
-//    profileChanged: function() {
-//        if (!this.selectHeroView) {
-//            this.selectHeroView = new SelectHeroView({model: this.model});
-//            this.selectHeroView.render();
-//        } else {
-//            this.selectHeroView.delegateEvents(); // delegate events when the view is recycled
-//        }
-//
-//        $("#content").html(this.selectHeroView.el);
-//    },
-
-//    heroChanged: function() {
-//        if (!this.heroStatsView) {
-//            this.heroStatsView = new HeroStatsView({model: this.model});
-//            this.heroStatsView.render();
-//        } else {
-//            this.heroStatsView.render();
-//            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
-//        }
-//
-//        $("#content").html(this.heroStatsView.el);
-//    },
 
     welcome: function() {
         this.model.clear();
         this.model.profile.clear();
         this.model.hero.clear();
 
-//        if (!this.homeView) {
-//            this.homeView = new HomeView();
-//            this.homeView.render();
-//
-//        } else {
-//            this.homeView.render();
-//            this.homeView.delegateEvents(); // delegate events when the view is recycled
-//        }
-
         this.homeView = new HomeView();
         this.homeView.render();
         this.homeView.on('profileLoaded', function(profile) {
-            this.profile(profile);
+            this.openProfile(profile);
         }, this);
 
         $("#content").html(this.homeView.el);
     },
 
-    profile: function(profile) {
-        this.model.set({
-            'region': profile.get('region'),
-            'battleTag': profile.get('battleTag'),
-            'battleTagSafe': profile.get('battleTagSafe'),
-            'heroId': null
-        });
+    routeProfile: function(region, battleTagSafe) {
+        $("#content").html(this.loadingTemplate());
 
-        // copy profile
-        this.model.profile.clear({'silent': true});
-        this.model.profile.set(profile.attributes);
-
-        this.selectHero(profile);
-    },
-
-    hero: function(battletag, heroId) {
+        this.model.clear();
+        this.model.profile.clear();
         this.model.hero.clear();
-//        this.model.profile.loadProfile(battletag);
 
-        if (!this.heroStatsView) {
-            this.heroStatsView = new HeroStatsView({model: this.model});
-            this.heroStatsView.render();
-        } else {
-            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
-        }
-        $("#content").html(this.heroStatsView.el);
-
-//        this.model.profile.set({'battleTagSafe': battletag});
-        this.model.hero.loadHero(battletag, heroId);
-//
-//        if (!this.heroStatsView) {
-//            this.heroStatsView = new HeroStatsView({model: {'profile': this.profile, 'hero': this.hero, 'page': page}});
-//            this.heroStatsView.render();
-//        } else {
-//            this.heroStatsView.delegateEvents(); // delegate events when the view is recycled
-//        }
-//
-//        $("#content").html(this.heroStatsView.el);
+        var profile = new Profile();
+        profile.on('load', function() {
+            this.openProfile(profile);
+        }, this);
+        profile.on('error', this.welcome, this);
+        profile.loadProfile(battleTagSafe, region);
     },
 
-    selectHero: function(profile) {
+    routeHero: function(region, battletag, heroId) {
+        $("#content").html(this.loadingTemplate());
+
+        this.model.clear();
+        this.model.profile.clear();
+        this.model.hero.clear();
+
+        var hero = new Hero();
+        hero.on('load', function() {
+            this.openHero(region, battletag, hero);
+        }, this);
+        hero.on('error', this.welcome, this);
+        hero.loadHero(battletag, heroId, region);
+
+        var profile = new Profile();
+        profile.on('load', function() {
+            this.model.updateProfile(profile);
+        }, this);
+        profile.loadProfile(battletag, region);
+    },
+
+    openProfile: function(profile) {
+        this.model.updateProfile(profile);
+
         this.selectHeroView = new SelectHeroView({model: profile});
         this.selectHeroView.render();
         this.selectHeroView.on('heroSelected', function(heroId) {
-//            this.hero(heroId);
+
         }, this);
 
         $("#content").html(this.selectHeroView.el);
+        Backbone.history.navigate("profile/" + profile.get('region') + "/" + profile.get('battleTagSafe'));
     },
 
-    calcHero: function(heroId) {
+    openHero: function(region, battletag, hero) {
+        this.heroStatsView = new HeroStatsView({model: this.model});
+        this.heroStatsView.render();
 
+        $("#content").html(this.heroStatsView.el);
+        Backbone.history.navigate("hero/" + region + "/" + battletag + "/" + hero.get('id'));
     }
-
 });
 
 app = new Router();

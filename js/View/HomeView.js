@@ -9,8 +9,11 @@ window.HomeView = Backbone.View.extend({
         this.template = _.template($('#welcome-template').html());
         this.alertTemplate = _.template($('#alert-template').html());
         this.model = new Profile();
-        this.model.on('change:loading', this.onLoadingChange, this);
-        this.model.on('change:error change:battleTag', this.onLoadingChange, this);
+        this.model.on('change:loading', this.renderLoading, this);
+        this.model.on('load', function() {
+            this.trigger('profileLoaded', this.model);
+        }, this);
+        this.model.on('error', this.onError, this);
     },
 
     events: {
@@ -23,19 +26,11 @@ window.HomeView = Backbone.View.extend({
         return this;
     },
 
-    onLoadingChange: function() {
-        this.renderLoading();
-
-        if (!this.model.get('loading')) {
-            if (this.model.get('battleTag')) {
-                this.trigger('profileLoaded', this.model);
-            } else {
-                var $ah = $('#alert-holder');
-                $ah.empty();
-                $ah.append(this.alertTemplate({'title': 'Error!', 'text': "Couldn't load profile. Is the battletag ok?"}));
-                $('.alert', $ah).alert();
-            }
-        }
+    onError: function() {
+        var $ah = $('#alert-holder');
+        $ah.empty();
+        $ah.append(this.alertTemplate({'title': 'Error!', 'text': "Couldn't load profile. Is the battletag ok?"}));
+        $('.alert', $ah).alert();
     },
 
     renderLoading: function() {
@@ -50,7 +45,6 @@ window.HomeView = Backbone.View.extend({
         if (!btValue || btValue == '')
             return;
         this.model.loadProfile(btValue, $('#region_input').val());
-//        Backbone.history.navigate("profile/" + $('#bt_input').val().replace('#', '-').replace(/\s/g, ""), {'trigger': true});
     }
 
 });
