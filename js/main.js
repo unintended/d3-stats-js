@@ -13,7 +13,7 @@ window.Router = Backbone.Router.extend({
 
         this.headerView = new HeaderView({model: this.model});
         this.headerView.on('battleTagClicked', function() {
-            this.selectHero(this.profile);
+            this.openProfile(this.model.profile);
         }, this);
         $('.header').html(this.headerView.render().el);
     },
@@ -26,6 +26,7 @@ window.Router = Backbone.Router.extend({
         this.homeView = new HomeView();
         this.homeView.render();
         this.homeView.on('profileLoaded', function(profile) {
+            this.model.updateProfile(profile);
             this.openProfile(profile);
         }, this);
 
@@ -54,27 +55,27 @@ window.Router = Backbone.Router.extend({
         this.model.profile.clear();
         this.model.hero.clear();
 
-        var hero = new Hero();
-        hero.on('load', function() {
-            this.openHero(region, battletag, hero);
-        }, this);
-        hero.on('error', this.welcome, this);
-        hero.loadHero(battletag, heroId, region);
+//        var hero = new Hero();
+//        hero.on('load', function(hero) {
+//
+//        }, this);
+//        hero.on('error', this.welcome, this);
+//        hero.loadHero(battletag, heroId, region);
 
         var profile = new Profile();
         profile.on('load', function() {
             this.model.updateProfile(profile);
         }, this);
         profile.loadProfile(battletag, region);
+
+        this.openHero(region, battletag, heroId);
     },
 
     openProfile: function(profile) {
-        this.model.updateProfile(profile);
-
         this.selectHeroView = new SelectHeroView({model: profile});
         this.selectHeroView.render();
         this.selectHeroView.on('heroSelected', function(heroId) {
-
+            this.openHero(this.model.get('region'), this.model.get('battleTagSafe'), heroId);
         }, this);
 
         $("#content").html(this.selectHeroView.el);
@@ -82,11 +83,13 @@ window.Router = Backbone.Router.extend({
     },
 
     openHero: function(region, battletag, hero) {
+        this.model.hero.clear();
+        this.model.hero.loadHero(battletag, hero, region);
         this.heroStatsView = new HeroStatsView({model: this.model});
         this.heroStatsView.render();
 
         $("#content").html(this.heroStatsView.el);
-        Backbone.history.navigate("hero/" + region + "/" + battletag + "/" + hero.get('id'));
+        Backbone.history.navigate("hero/" + region + "/" + battletag + "/" + hero);
     }
 });
 

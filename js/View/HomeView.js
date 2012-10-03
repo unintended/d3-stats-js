@@ -22,6 +22,12 @@ window.HomeView = Backbone.View.extend({
 
     render:function () {
         $(this.el).html(this.template());
+        $('#bt_input', this.el).keypress(function(e) {
+            if (e.which == 13) {
+                $(this).blur();
+                $('#bt_submit').focus().click();
+            }
+        });
         this.renderLoading();
         return this;
     },

@@ -18,10 +18,10 @@ window.Hero = Backbone.Model.extend({
         this.paragon = 0;
     },
 
-    loadHero: function (profile, heroId, region) {
+    loadHero: function (battletag, heroId, region) {
         region = region || this.defaults.region;
 
-        var url = this.url[region] + profile + '/hero/' + heroId;
+        var url = this.url[region] + battletag + '/hero/' + heroId;
         console.log('fetch: ' + url);
         var self = this;
         $.ajax({
@@ -29,9 +29,9 @@ window.Hero = Backbone.Model.extend({
             dataType:"jsonp",
             success:function (data) {
                 if (!data.id) {
-                    self.clear();
                     return;
                 }
+                self.clear({'silent': true});
                 self.set(data);
 //                console.log("profile search success: " + JSON.stringify(self.toJSON()));
             }

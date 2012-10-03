@@ -21,10 +21,7 @@ window.HeaderView = Backbone.View.extend({
     },
 
     renderBattleTag: function() {
-        $('.profile', this.el).text(this.model.get('battleTag'));
-        $('.profile', this.el).click(function() {
-            this.trigger('battleTagClicked');
-        }, this);
+        $('.profile', this.el).text(this.model.get('battleTag') || '');
     },
 
 //    renderHeroesList: function() {
@@ -43,7 +40,12 @@ window.HeaderView = Backbone.View.extend({
     render: function () {
         $(this.el).html(this.template());
         this.renderBattleTag();
-//        this.renderHeroesList();
+
+        var self = this;
+        $('.profile', this.el).click(function(event) {
+            event.preventDefault();
+            self.trigger('battleTagClicked');
+        });
         return this;
     }
 });

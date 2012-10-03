@@ -14,8 +14,6 @@ window.SelectHeroView = Backbone.View.extend({
         $(this.el).html(this.template());
 
         var self = this;
-        var battleTag = this.model.get('battleTagSafe');
-
         _.each(this.model.get('heroes'), function (hero) {
             var elHtml = self.itemTemplate({
                 'heroName': hero.name,
@@ -26,8 +24,8 @@ window.SelectHeroView = Backbone.View.extend({
             var itemEl = $(elHtml);
             $('a', itemEl).click(function(event) {
                 event.preventDefault();
-                this.trigger('heroSelected', hero.id);
-            }, this);
+                self.trigger('heroSelected', hero.id);
+            });
             $('ul', self.el).append(itemEl);
         });
 
