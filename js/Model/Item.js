@@ -151,7 +151,7 @@ var SimulationModel = Backbone.Model.extend({
                     (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
         }
 
-        var oh_dph, oh_w_aps, oh_aps, oh_dps, oh_dps_unbuffed;
+        var oh_dph, oh_w_aps = 0, oh_aps, oh_dps, oh_dps_unbuffed;
         if (offHandWeapon && offHandWeapon.get('dps') > 0) {
             oh_w_aps = offHandWeapon.get('attacksPerSecond');
             oh_dph = (offHandWeapon.get('wmindmg') + offHandWeapon.get('wmaxdmg')) / 2.0;
@@ -163,22 +163,82 @@ var SimulationModel = Backbone.Model.extend({
 
         var DW = 1.15;
         var elem_dmg = 0;
-
-        var avg_mdg_with_dw = (mh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) *
-                ((mh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) +
-                (oh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg') / 2.0)) *
-                ((oh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) + elem_dmg;
-
         var ias = this.gearStats.get('ias');
         var cc = this.gearStats.get('cc');
         var cdmg = this.gearStats.get('cdmg');
+        var minbonus = this.gearStats.get('mindmg');
+        var maxbonus = this.gearStats.get('maxdmg');
         var dmgstatval = this.gearStats.get(this.get('dmgstat'));
 
-        var avg_as = ((mh_w_aps * (DW + ias) + oh_w_aps * (1.15 + ias)) / 2.0);
 
-        var dps = avg_mdg_with_dw * avg_as * (1 + cc * cdmg) * (1 + dmgstatval / 100);
+        /*
+                (
+                    (1 + passive skill boosts) *
+                    (Weapon 1 average damage + ((minimum damage bonus + maximum damage bonus)/2)) *
+                    (Weapon Damage Multipliers) *
+                    (Attack Speed)*
+                    (1 + ( crit% * crit damage %))*
+                    ( 1 + (main stat / 100))*
+                    (average attack speed of both weapons / weapon 1 attack speed)
 
-        updObj.dps_unbuffed = dps;
+                + (1 + passive skill boosts)*(Weapon 2 average damage + ((minimum damage bonus + maximum damage bonus)/2))*(Weapon Damage Multipliers)*(Attack Speed)*(1 + ( crit% * crit damage %))*( 1 + (main stat / 100))*(average attack speed of both weapons / weapon 2 attack speed)
+                ) * 0.575
+        */
+        var baseMainAPS = mh_w_aps;
+        var baseOffAPS = oh_w_aps;
+        var baseMainMinDmg = mainHandWeapon.get('wmindmg');
+        var baseMainMaxDmg = mainHandWeapon.get('wmaxdmg');
+        var baseOffMinDmg = offHandWeapon.get('wmindmg');
+        var baseOffMaxDmg = offHandWeapon.get('wmaxdmg');
+
+        // TODO: fill these values
+        var mainBonusAps = 0;
+        var offBonusAps = 0;
+        var bonusDmgPer = 0;
+
+        var mainAvgWDmg = (baseMainMinDmg + baseMainMaxDmg) / 2;
+        var offAvgWDmg = (baseOffMinDmg + baseOffMaxDmg) / 2;
+        var gearAvgBonusDmg = (minbonus + maxbonus) / 2;
+
+        var total =
+            baseMainAPS == 0 ? 0 : 1 / ((1 / (baseMainAPS + offBonusAps) + (baseOffAPS == 0 ? 0 : 1) / (baseOffAPS == 0 ? 1 : baseOffAPS + mainBonusAps)) / (baseOffAPS == 0 ? 1 : 2))
+            * (1 + ias + (baseOffAPS == 0 ? 0 : .15))
+            * (((1 - cc) * ((mainAvgWDmg + gearAvgBonusDmg) *  (1 + dmgstatval / 100) * (1 + bonusDmgPer / 100))
+                    + cc * ((mainAvgWDmg + gearAvgBonusDmg) * (1 + dmgstatval / 100) * (1 + bonusDmgPer / 100) * (1 + cdmg))
+                    + ((1 - cc) * (baseOffAPS == 0 ? 0 : (offAvgWDmg + gearAvgBonusDmg) * (1 + dmgstatval / 100) * (1 + bonusDmgPer / 100))
+                        + cc * ((baseOffAPS == 0 ? 0 : (offAvgWDmg + gearAvgBonusDmg) * (1 + dmgstatval / 100) * (1 + bonusDmgPer / 100)) * (1 + cdmg)))
+                ) / (baseOffAPS == 0 ? 1 : 2)
+            );
+
+        updObj.dps_unbuffed = total;
+
+
+//        var avg_as = ((mh_w_aps * (DW +  ias) + oh_w_aps * (DW +  ias)) / 2).toFixed(2);
+//
+//        var ias2 = 0;
+//
+//        var avg_mdg_with_dw = (
+//            (mh_dph + (minbonus + maxbonus) / 2.0) *
+//                (1 + cc * cdmg) * (1 + (dmgstatval / 100)) * mh_w_aps * (1 + ias) *
+//                (avg_as / (mh_w_aps * (DW + ias)))
+//        +
+//            (oh_dph + (minbonus + maxbonus) / 2.0) *
+//                (1 + cc * cdmg) * (1 + (dmgstatval / 100)) * oh_w_aps * (1 + ias) *
+//                (avg_as / (oh_w_aps * (DW + ias)))
+//            ) * 0.575;
+//
+//                ((mh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) +
+//                (oh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg') / 2.0)) *
+//                ((oh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) + elem_dmg;
+
+
+
+//        var avg_as = ((mh_w_aps * (DW + ias) + oh_w_aps * (1.15 + ias)) / 2.0);
+//
+//        var dps = avg_mdg_with_dw * avg_as * (1 + cc * cdmg) * (1 + dmgstatval / 100);
+//        var dps = avg_mdg_with_dw;
+
+//        updObj.dps_unbuffed = dps;
 //
 //        if (oh_dps_unbuffed && mh_dps_unbuffed) { // two weapons
 //            var average_weapons_aps = (oh_aps + mh_aps) / 2.0; // mainHandWeapon.get('attacksPerSecond') + offHandWeapon.get('attacksPerSecond') / 2.0;
