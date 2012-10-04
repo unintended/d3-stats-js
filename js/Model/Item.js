@@ -138,14 +138,55 @@ var SimulationModel = Backbone.Model.extend({
         updObj = {};
         updObj.weapon_dps = 0;
         var mainHandWeapon = this.gear.mainHand.at(0);
+        var offHandWeapon = this.gear.offHand.at(0);
+
+        var mh_dph, mh_w_aps, mh_aps, mh_dps, mh_dps_unbuffed;
         if (mainHandWeapon && mainHandWeapon.get('dps') > 0) {
-            updObj.weapon_dph = (mainHandWeapon.get('wmindmg') + mainHandWeapon.get('wmaxdmg')) / 2.0;
-            updObj.weapon_aps = mainHandWeapon.get('attacksPerSecond') * (1 + this.gearStats.get('ias'));
-            updObj.weapon_dps = (updObj.weapon_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) * updObj.weapon_aps;
-            updObj.dps_unbuffed = updObj.weapon_dps *
-                (1 + (this.gearStats.get(this.get('dmgstat')) / 100)) *
-                (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
+            mh_w_aps = mainHandWeapon.get('attacksPerSecond');
+            mh_dph = (mainHandWeapon.get('wmindmg') + mainHandWeapon.get('wmaxdmg')) / 2.0;
+            mh_aps = mh_w_aps * (1 + this.gearStats.get('ias'));
+            mh_dps = (mh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) * mh_aps;
+            mh_dps_unbuffed = mh_dps *
+                    (1 + (this.gearStats.get(this.get('dmgstat')) / 100)) *
+                    (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
         }
+
+        var oh_dph, oh_w_aps, oh_aps, oh_dps, oh_dps_unbuffed;
+        if (offHandWeapon && offHandWeapon.get('dps') > 0) {
+            oh_w_aps = offHandWeapon.get('attacksPerSecond');
+            oh_dph = (offHandWeapon.get('wmindmg') + offHandWeapon.get('wmaxdmg')) / 2.0;
+            oh_aps = oh_w_aps * (1 + this.gearStats.get('ias'));
+            oh_dps = (oh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) * oh_aps;
+            oh_dps_unbuffed = oh_dps * (1 + (this.gearStats.get(this.get('dmgstat')) / 100)) *
+                    (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
+        }
+
+        var DW = 1.15;
+        var elem_dmg = 0;
+
+        var avg_mdg_with_dw = (mh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg')) / 2.0) *
+                ((mh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) +
+                (oh_dph + (this.gearStats.get('mindmg') + this.gearStats.get('maxdmg') / 2.0)) *
+                ((oh_w_aps * DW)/((mh_w_aps * DW) + (oh_w_aps * DW))) + elem_dmg;
+
+        var ias = this.gearStats.get('ias');
+        var cc = this.gearStats.get('cc');
+        var cdmg = this.gearStats.get('cdmg');
+        var dmgstatval = this.gearStats.get(this.get('dmgstat'));
+
+        var avg_as = ((mh_w_aps * (DW + ias) + oh_w_aps * (1.15 + ias)) / 2.0);
+
+        var dps = avg_mdg_with_dw * avg_as * (1 + cc * cdmg) * (1 + dmgstatval / 100);
+
+        updObj.dps_unbuffed = dps;
+//
+//        if (oh_dps_unbuffed && mh_dps_unbuffed) { // two weapons
+//            var average_weapons_aps = (oh_aps + mh_aps) / 2.0; // mainHandWeapon.get('attacksPerSecond') + offHandWeapon.get('attacksPerSecond') / 2.0;
+//            updObj.dps_unbuffed = ((mh_dps_unbuffed * average_weapons_aps / oh_aps) +
+//                    (oh_dps_unbuffed * average_weapons_aps / mh_aps)) * 0.575;
+//        } else {
+//            updObj.dps_unbuffed = mh_dps_unbuffed || oh_dps_unbuffed;
+//        }
         this.set(updObj);
     },
 
@@ -311,13 +352,13 @@ var Item = Backbone.Model.extend({
             });
 
             var wd_phys_min = js_wd_phys_min + js_wd_phys_bon_min;
-            var minDmg = Math.round(wd_phys_min * (1 + js_wd_phys_bon_perc) + js_wd_elem_min);
+            var minDmg = wd_phys_min * (1 + js_wd_phys_bon_perc) + js_wd_elem_min;
 
             var wd_phys_max_base = js_wd_phys_min + js_wd_phys_delta;
             if (wd_phys_max_base < wd_phys_min)
                 wd_phys_max_base = wd_phys_min + 1;
-            var maxDmg = Math.round((wd_phys_max_base + js_wd_phys_bon_delta) * (1 + js_wd_phys_bon_perc)
-                + js_wd_elem_min + js_wd_elem_delta);
+            var maxDmg = (wd_phys_max_base + js_wd_phys_bon_delta) * (1 + js_wd_phys_bon_perc)
+                + js_wd_elem_min + js_wd_elem_delta;
 
             updObj.wmindmg = minDmg;
             updObj.wmaxdmg = maxDmg;
