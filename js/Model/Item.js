@@ -346,8 +346,8 @@ var Item = Backbone.Model.extend({
         'Attacks_Per_Second_Percent': {to: 'ias', attr: 'min'},
         'Damage_Min#Physical': {to: 'mindmg', attr: 'min'},
         'Damage_Delta#Physical' : {to: 'deltadmg', attr: 'min'},
-        'Damage_Weapon_Bonus_Min#Physical' : {to: 'wdbonusmin'},
-        'Damage_Weapon_Bonus_Delta#Physical' : {to: 'wdbonusdelta'}
+        'Damage_Weapon_Bonus_Min#Physical' : {to: 'wdbonusmin', attr: 'min'},
+        'Damage_Weapon_Bonus_Delta#Physical' : {to: 'wdbonusdelta', attr: 'min'}
 
     },
 
