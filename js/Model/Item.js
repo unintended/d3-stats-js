@@ -34,6 +34,7 @@ var SimulationModel = Backbone.Model.extend({
         this.gear = {};
         this.gear.head = new ItemCollection();
         this.gear.head.on('change', this.updateGearStatsWithSets, this);
+        this.gear.head.on('add', this.checkItemOnAdd, this);
         this.gear.shoulders = new ItemCollection();
         this.gear.shoulders.on('change', this.updateGearStatsWithSets, this);
         this.gear.neck = new ItemCollection();
@@ -84,6 +85,12 @@ var SimulationModel = Backbone.Model.extend({
         }, this);
 
         this.updateBaseStats(hero);
+    },
+
+    checkItemOnAdd: function(item, collection, options) {
+        if (!item.get('name')) {
+            item.set({'name': 'Item #' + options.index});
+        }
     },
 
     updateGearStatsWithSets: function() {
@@ -161,8 +168,6 @@ var SimulationModel = Backbone.Model.extend({
                     (1 + this.gearStats.get('cc') * this.gearStats.get('cdmg'));
         }
 
-        var DW = 1.15;
-        var elem_dmg = 0;
         var ias = this.gearStats.get('ias');
         var cc = this.gearStats.get('cc');
         var cdmg = this.gearStats.get('cdmg');
@@ -456,7 +461,7 @@ var Item = Backbone.Model.extend({
         name:   null,
         vit:    0,
         dex:    0,
-        int:    0,
+        'int':    0,
         str:    0,
         def:    0,
         cc:     0,

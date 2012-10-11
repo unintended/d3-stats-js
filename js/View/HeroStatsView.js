@@ -146,6 +146,7 @@ window.HeroStatsView = Backbone.View.extend({
                 : new EquippedItemView({model:{dmgstat:mainModel.simulationModel.get('dmgstat'), item:item}}); // the first item is equipped
             slotEl.append(itemView.render().el);
         });
+
     },
 
     updateSimulationModel:function (hero) {
@@ -186,6 +187,15 @@ window.HeroStatsView = Backbone.View.extend({
     render:function () {
         $(this.el).html(this.template(this.simulationModel.toJSON()));
         this.updateSimulationModel(this.model.hero);
+
+        var self = this;
+        _.each(this.simulationModel.gear, function (items, slot) {
+            $('.item-slot-' + slot + ' a', self.el).unbind('click');
+            $('.item-slot-' + slot + ' a', self.el).click(function(event) {
+                event.preventDefault();
+                items.push(new Item());
+            });
+        });
 
 //        $('li', this.el).click(function(event) {
 //            event.preventDefault();
@@ -232,19 +242,54 @@ window.HeroStatsView = Backbone.View.extend({
 
 window.ItemView = Backbone.View.extend({
 
-    tagName:'tr',
+    tagName:'li',
 
     className:'item',
 
     initialize:function () {
-        this.model.on('change', this.render, this);
-        this.template = _.template($('#item-template').html());
+        this.model.item.on('change', this.render, this);
     },
 
     render:function () {
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.empty();
+        $("<span/>").addClass("item-name").text(this.model.item.get("name")).appendTo(this.$el);
+
+        var dmgstat = this.model.dmgstat;
+        $('<span/>')
+//                $('<form class="form-inline" />')
+//                $('<div class="input-append"/>')
+//                        .append('+')
+//                .append(
+                .append($('<span />')
+                    .append($('<input class="span2" size="3" type="text"/>').val(this.model.item.get(dmgstat) || undefined).attr('placeholder', dmgstat)))
+                .append($('<span class="input-append" />')
+                    .append($('<input class="span2" size="3" type="text"/>').val(this.model.item.get('cc') || undefined).attr('placeholder', 'CC'))
+                    .append($('<span class="add-on"/>').text('%')))
+                .append($('<span class="input-append" />')
+                    .append($('<input class="span2" size="3" type="text"/>').val(this.model.item.get('cdmg') || undefined).attr('placeholder', 'CDmg'))
+                    .append($('<span class="add-on"/>').text('%')))
+                .append($('<div />')
+                    .append('+')
+                    .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('mindmg') || undefined))
+                    .append('-')
+                    .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('maxdmg') || undefined)))
+                .appendTo(this.$el);
+//                $('<div class=""/>').append('+' + renderSettings[dmgstat].postfix).append($('input')))
+
+
         return this;
-    }
+    },
+/*
+    renderStatPlaceHolder: function (val, settings) {
+        if (val) {
+            if (settings.percent)
+                val *= 100;
+            return settings.prefix + val.toFixed(settings.precision) + (settings.percent ? '% ' : ' ') + settings.postfix;
+        }
+        return undefined;
+    },*/
+
+    mandatoryFields: ['dex', 'cc']
 
 });
 
@@ -256,14 +301,10 @@ window.EquippedItemView = Backbone.View.extend({
 
     initialize:function () {
         this.model.item.on('change', this.render, this);
-
-        this.template = _.template($('#equipped-item-template').html());
     },
 
     render:function () {
-        this.$el.html(this.template(this.model.item.toJSON()));
-
-        var self = this;
+        this.$el.empty();
 
         $("<span/>").addClass("item-name").append(
             $("<a/>").attr("href", "http://eu.battle.net/api/d3/data/" + this.model.item.get("tooltipParams"))
@@ -271,6 +312,7 @@ window.EquippedItemView = Backbone.View.extend({
                 .text(this.model.item.get("name"))
         ).appendTo(this.$el);
 
+        var self = this;
         $('<span/>').text($.map(renderSettings,function (v, k) {
             return renderStat(self.model.item.get(k), v);
         }).join(', ')).appendTo(this.$el);

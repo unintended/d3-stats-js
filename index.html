@@ -24,7 +24,7 @@
     <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body>
-<div class="header"></div>
+<!--<div class="header"></div>-->
 
 <div class="container">
     <div id="content"></div>
@@ -145,51 +145,51 @@
         <div class="row-fluid">
             <div class="span6">
                 <div class="well well-small">
-                    <ul class="table-list item-slot-mainHand">
+                    <ul class="table-list item-slot item-slot-mainHand">
                         <li class="section-header">Main Hand</li>
                         <!--<a class="pull-right btn btn-mini btn-info"><i class="icon-plus icon-white"></i></a>-->
                     </ul>
-                    <ul class="table-list item-slot-offHand">
+                    <ul class="table-list item-slot item-slot-offHand">
                         <li class="section-header">Off Hand</li>
                     </ul>
                 </div>
                 <div class="well well-small">
-                    <ul class="table-list item-slot-head">
-                        <li class="section-header">Head</li>
+                    <ul class="table-list item-slot item-slot-head">
+                        <li class="section-header"><span>Head <a class="pull-right" href="#">Add</a></span></li>
                     </ul>
-                    <ul class="table-list item-slot-shoulders">
+                    <ul class="table-list item-slot item-slot-shoulders">
                         <li class="section-header">Shoulders</li>
                     </ul>
-                    <ul class="table-list item-slot-neck">
+                    <ul class="table-list item-slot item-slot-neck">
                         <li class="section-header">Neck</li>
                     </ul>
-                    <ul class="table-list item-slot-hands">
+                    <ul class="table-list item-slot item-slot-hands">
                         <li class="section-header">Hands</li>
                     </ul>
-                    <ul class="table-list item-slot-torso">
+                    <ul class="table-list item-slot item-slot-torso">
                         <li class="section-header">Torso</li>
                     </ul>
-                    <ul class="table-list item-slot-bracers">
+                    <ul class="table-list item-slot item-slot-bracers">
                         <li class="section-header">Bracers</li>
                     </ul>
-                    <ul class="table-list item-slot-leftFinger">
+                    <ul class="table-list item-slot item-slot-leftFinger">
                         <li class="section-header">Left Finger</li>
                     </ul>
-                    <ul class="table-list item-slot-rightFinger">
+                    <ul class="table-list item-slot item-slot-rightFinger">
                         <li class="section-header">Right Finger</li>
                     </ul>
-                    <ul class="table-list item-slot-waist">
+                    <ul class="table-list item-slot item-slot-waist">
                         <li class="section-header">Waist</li>
                     </ul>
-                    <ul class="table-list item-slot-legs">
+                    <ul class="table-list item-slot item-slot-legs">
                         <li class="section-header">Legs</li>
                     </ul>
-                    <ul class="table-list item-slot-feet">
+                    <ul class="table-list item-slot item-slot-feet">
                         <li class="section-header">Feet</li>
                     </ul>
                 </div>
                 <div class="well well-small">
-                    <ul class="table-list item-slot-setBonuses">
+                    <ul class="table-list item-slot item-slot-setBonuses">
                         <li class="section-header">Set Bonuses</li>
                     </ul>
                 </div>
@@ -208,46 +208,6 @@
             </div>
         </div>
     </script>
-
-    <script type="text/template" id="equipped-item-template">
-        <!--<td class="item-name"><a class="d3-color-<%= displayColor %>" href="http://eu.battle.net/api/d3/data/<%= tooltipParams %>" target="_blank"><%= name %></a></td>-->
-        <!--<td class="item-stat dmgstat"></td>-->
-        <!--<td class="item-stat cc"></td>-->
-        <!--<td class="item-stat cdmg"></td>-->
-        <!--<td class="item-stat ias"></td>-->
-        <!--<td class="item-stat mindmg"></td>-->
-        <!--<td class="item-stat maxdmg"></td>-->
-        <!--<td>&nbsp;</td>-->
-    </script>
-
-    <script type="text/template" id="item-template">
-        <td ><%= name %></td>
-        <td class="item-stat dmgstat"></td>
-        <td class="item-stat cc"></td>
-        <td class="item-stat cdmg"></td>
-        <td class="item-stat ias"></td>
-        <td class="item-stat mindmg"></td>
-        <td class="item-stat maxdmg"></td>
-        <td>&nbsp;</td>
-    </script>
-
-    <!--<script type="text/template" id="item-template">
-        <td><%= name %></td>
-        <td><% if (dmgstat > 0) print(dmgstat); %></td>
-        <td><% if (cc > 0) print((cc * 100).toFixed(1)); %>%</td>
-        <td><% if (cdmg > 0) print((cdmg * 100).toFixed(0)); %>%</td>
-        <td><% if (ias > 0) print((ias * 100).toFixed(2)); %>%</td>
-        <td><% if (mindmg > 0) print(mindmg); %></td>
-        <td><% if (maxdmg > 0) print(maxdmg); %></td>
-        <td><a class="btn btn-mini btn-danger" href="#"><span class="icon-remove icon-white"></span></a></td>
-    </script>-->
-    <!--
-        <strong class="d3-color-<%= displayColor %>"><%= name %></strong>
-        +<%= dex %> Dex,
-        +<% print((cc * 100).toFixed(1)); %>% CC,
-        +<% print((cdmg * 100).toFixed(0)); %>% CDmg,
-        +<%= mindmg %>-<%= maxdmg %> Dmg
-    </script -->
 </div>
 
 <script src="js/Model/Profile.js" type="text/javascript"></script>
