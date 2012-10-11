@@ -260,7 +260,7 @@ window.ItemView = Backbone.View.extend({
 //                $('<div class="input-append"/>')
 //                        .append('+')
 //                .append(
-                .append($('<span />')
+                /*.append($('<span />')
                     .append($('<input class="span2" size="3" type="text"/>').val(this.model.item.get(dmgstat) || undefined).attr('placeholder', dmgstat)))
                 .append($('<span class="input-append" />')
                     .append($('<input class="span2" size="3" type="text"/>').val(this.model.item.get('cc') || undefined).attr('placeholder', 'CC'))
@@ -272,7 +272,8 @@ window.ItemView = Backbone.View.extend({
                     .append('+')
                     .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('mindmg') || undefined))
                     .append('-')
-                    .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('maxdmg') || undefined)))
+                    .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('maxdmg') || undefined)))*/
+            .append($('<input placeholder="" />').val(this.model.item.shortcut()))
                 .appendTo(this.$el);
 //                $('<div class=""/>').append('+' + renderSettings[dmgstat].postfix).append($('input')))
 

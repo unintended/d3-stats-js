@@ -435,6 +435,16 @@ var Item = Backbone.Model.extend({
         this.set(updObj);
     },
 
+    shortcut: function() {
+        var sc = [];
+        var isWeapon = this.get('dps');
+        if (isWeapon) {
+            sc.push(this.get('twoHanded') ? '2h' : '1h');
+            sc.push(this.get('wmindmg') + '-' + this.get('wmaxdmg') + '@' + this.get('dps').toFixed(2));
+        }
+        
+    },
+
     commonDataMappings: {
         'attacksPerSecond': {to: 'attacksPerSecond', attr: 'min'},
         'dps': {to: 'dps', attr: 'min'},
