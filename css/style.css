@@ -89,6 +89,28 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+/*
+.item input {
+  font-size: 11px;
+  min-height: 10px !important;
+  line-height: 10px;
+  width: 100%;
+}*/
+
+.item .left {
+  width: 120px;
+  float: left;
+  /*padding-right: 5px;*/
+}
+
+.item .right {
+  /*margin-left: 120px;*/
+  float: right;
+  width: 300px;
+  padding-right: 3px;
+  padding-bottom: 3px;
+  /*padding-right: 5px;*/
+}
 
 .stat-name {
     font-weight: bold;

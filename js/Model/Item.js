@@ -440,10 +440,46 @@ var Item = Backbone.Model.extend({
         var isWeapon = this.get('dps');
         if (isWeapon) {
             sc.push(this.get('twoHanded') ? '2h' : '1h');
-            sc.push(this.get('wmindmg') + '-' + this.get('wmaxdmg') + '@' + this.get('dps').toFixed(2));
+            sc.push(this.get('wmindmg') + '-' + this.get('wmaxdmg') + '@' + this.get('aps').toFixed(2));
         }
-        
+        _.each(this.scStats, function(stat) {
+            var val = this.get(stat);
+            if (val > 0) {
+                sc.push(val + '' + stat);
+            }
+        }, this);
+        return sc.join(' ');
     },
+
+    loadFromShortcut: function (shortcut) {
+        var updObj = {};
+        var sc = shortcut.split(/\\s+/);
+
+        var weaponRE = /^(\d+)-(\d+)@(\d+)$/;
+        var dmgBonus = /^\+?(\d+)-(\d+)dmg$/;
+
+        _.each(sc, function(part) {
+            if (part.contains('@')) {
+
+                 var res = weaponRE.exec(sc[0]);
+                 updObj.minDamage = res[0];
+                 updObj.maxDamage = res[1];
+                 updObj.aps = res[2];
+            } else if (dmgBonus.exec(part)) {
+
+            }
+        });
+
+        if (sc.length){
+
+
+        }
+
+
+        this.clear({silent: true});
+    },
+
+    scStats: ['def', 'vit', 'dex', 'int', 'str', 'cc', 'cdmg', 'ias'],
 
     commonDataMappings: {
         'attacksPerSecond': {to: 'attacksPerSecond', attr: 'min'},

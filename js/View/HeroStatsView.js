@@ -168,7 +168,6 @@ window.HeroStatsView = Backbone.View.extend({
         }, this);
     },
 
-    displayBaseStats:['cc', 'cdmg'],
     displayGearStats:['cc', 'cdmg', 'ias', 'mindmg', 'maxdmg'],
     displayDamageStats:['weapon_dps', 'weapon_aps', 'dps_unbuffed'],
     statsNames:{
@@ -246,6 +245,10 @@ window.ItemView = Backbone.View.extend({
 
     className:'item',
 
+    events: {
+        "change input": "onShotcutChange"
+    },
+
     initialize:function () {
         this.model.item.on('change', this.render, this);
     },
@@ -255,7 +258,10 @@ window.ItemView = Backbone.View.extend({
         $("<span/>").addClass("item-name").text(this.model.item.get("name")).appendTo(this.$el);
 
         var dmgstat = this.model.dmgstat;
-        $('<span/>')
+        var $scInput = $('<input/>');//, {'class': 'span8'});
+        $scInput.val(this.model.item.shortcut());
+
+        $('<span/>').append($scInput)
 //                $('<form class="form-inline" />')
 //                $('<div class="input-append"/>')
 //                        .append('+')
@@ -273,13 +279,16 @@ window.ItemView = Backbone.View.extend({
                     .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('mindmg') || undefined))
                     .append('-')
                     .append($('<input class="span1" size="3" type="text"/>').val(this.model.item.get('maxdmg') || undefined)))*/
-            .append($('<input placeholder="" />').val(this.model.item.shortcut()))
                 .appendTo(this.$el);
 //                $('<div class=""/>').append('+' + renderSettings[dmgstat].postfix).append($('input')))
 
 
         return this;
     },
+
+    onShotcutChange: function () {
+        this.model.item.loadFromShortcut($('input', this.$el).val());
+    }
 /*
     renderStatPlaceHolder: function (val, settings) {
         if (val) {
@@ -289,9 +298,6 @@ window.ItemView = Backbone.View.extend({
         }
         return undefined;
     },*/
-
-    mandatoryFields: ['dex', 'cc']
-
 });
 
 window.EquippedItemView = Backbone.View.extend({
@@ -300,23 +306,37 @@ window.EquippedItemView = Backbone.View.extend({
 
     className:'item',
 
+    events: {
+        "click": "onClick"
+    },
+
     initialize:function () {
         this.model.item.on('change', this.render, this);
+        this.scVisible = false;
     },
 
     render:function () {
         this.$el.empty();
+        var $leftDiv = $('<div />').addClass('left');
+        var $rightDiv = $('<div />').addClass('right');
 
         $("<span/>").addClass("item-name").append(
             $("<a/>").attr("href", "http://eu.battle.net/api/d3/data/" + this.model.item.get("tooltipParams"))
                 .addClass("d3-color-" + this.model.item.get("displayColor"))
                 .text(this.model.item.get("name"))
-        ).appendTo(this.$el);
+        ).appendTo($leftDiv);
 
         var self = this;
         $('<span/>').text($.map(renderSettings,function (v, k) {
             return renderStat(self.model.item.get(k), v);
-        }).join(', ')).appendTo(this.$el);
+        }).join(', ')).appendTo($rightDiv);
+        $('<div/>').addClass('caret').addClass('pull-right').appendTo($rightDiv);
+
+        if (this.scVisible)
+            $('<div/>').append($('<input/>', {'type': 'text'})/*.addClass('uneditable-input')*/.val(this.model.item.shortcut())).appendTo($rightDiv);
+
+        this.$el.append($('<div class="clearfix"/>').append($leftDiv).append($rightDiv));
+
 
 //        $("<a/>").addClass("btn btn-mini btn-info").append(
 //            $("<i/>").addClass("icon-plus icon-white")
@@ -330,7 +350,11 @@ window.EquippedItemView = Backbone.View.extend({
 //        this.renderStat($('.mindmg', this.el), this.model.item.get('mindmg'));
 //        this.renderStat($('.maxdmg', this.el), this.model.item.get('maxdmg'));
         return this;
-    }
+    },
 
+    onClick: function() {
+        this.scVisible = !this.scVisible;
+        this.render();
+    }
 
 });
